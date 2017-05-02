@@ -1,0 +1,138 @@
+buildscript {
+    ext.dbflow_version = "4.0.0-beta5"
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'me.tatarka:gradle-retrolambda:3.6.0'
+    }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        applicationId "indi.yume.demo.newapplication"
+        minSdkVersion 15
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    dataBinding {
+        enabled = true
+    }
+    buildTypes {
+        debug {
+            multiDexEnabled true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            multiDexEnabled true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    productFlavors{
+        staging {
+            buildConfigField "String", "BASE_URL", "\"http://192.168.0.121:8080/fenrir/admin/\""
+        }
+        production {
+            buildConfigField "String", "BASE_URL", "\"http://yume.fenrir-inc.cn:8080/fenrir/admin/\""
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    packagingOptions {
+        exclude "META-INF/services/javax.annotation.processing.Processor"
+        exclude "META-INF/DEPENDENCIES"
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(":core")
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:support-annotations:25.3.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:multidex:1.0.1'
+
+    compile 'com.jakewharton:butterknife:8.5.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    compile 'com.google.dagger:dagger:2.10'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.10'
+
+    compile 'com.squareup.retrofit2:retrofit:2.2.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava2:2.2.0'
+    compile 'com.squareup.retrofit2:retrofit-mock:2.2.0'
+    compile "com.squareup.okhttp3:logging-interceptor:3.6.0"
+    compile 'com.squareup.okhttp3:okhttp-urlconnection:3.6.0'
+    compile ("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.1") {
+        exclude group: 'org.apache.oltu.oauth2', module: 'org.apache.oltu.oauth2.common'
+    }
+
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    compile 'com.jakewharton.rxbinding2:rxbinding:2.0.0'
+    compile 'com.jakewharton.rxbinding2:rxbinding-support-v4:2.0.0'
+    compile 'com.jakewharton.rxbinding2:rxbinding-design:2.0.0'
+    compile 'com.jakewharton.rxbinding2:rxbinding-recyclerview-v7:2.0.0'
+    compile 'io.reactivex.rxjava2:rxjava:2.0.7'
+    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.3@aar'
+
+    annotationProcessor "org.projectlombok:lombok:1.16.16"
+    provided "org.projectlombok:lombok:1.16.16"
+
+    annotationProcessor "com.github.Raizlabs.DBFlow:dbflow-processor:${dbflow_version}"
+    compile "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
+    compile "com.github.Raizlabs.DBFlow:dbflow:${dbflow_version}"
+
+    compile 'com.annimon:stream:1.1.6'
+    compile 'com.google.guava:guava:20.0'
+
+    compile 'com.github.brianegan.bansa:bansa:1.0.0-beta'
+    compile 'co.trikita:anvil-sdk15:0.5.0'
+    compile 'co.trikita:anvil-design:0.5.0'
+    compile 'co.trikita:anvil-support-v4:0.5.0'
+    compile 'co.trikita:anvil-recyclerview-v7:0.5.0'
+
+    compile 'com.github.Yumenokanata:AutoSharedPref:2.0.1'
+    compile ('com.github.Yumenokanata:FragmentManager:f4819efa20') {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
+    compile 'com.github.Yumenokanata.AvocadoViews:loadinglayout:2.0.1'
+    compile 'com.github.Yumenokanata.AvocadoViews:dsladapter:2.0.1'
+    compile 'com.github.Yumenokanata.AvocadoViews:adapterdatabinding:2.0.1'
+    compile 'com.github.Yumenokanata.AvocadoViews:statuslayout:2.0.1'
+    compile 'com.github.Yumenokanata:KeyboardVisibilityEvent:1.1'
+
+    androidTestCompile 'com.android.support:appcompat-v7:25.3.1'
+    androidTestCompile 'com.android.support:design:25.3.1'
+    androidTestCompile 'com.android.support:support-annotations:25.3.1'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
+    androidTestCompile 'org.mockito:mockito-core:2.3.4'
+    androidTestCompile 'com.linkedin.dexmaker:dexmaker-mockito:2.2.0'
+    testCompile 'com.squareup.okhttp3:mockwebserver:3.6.0'
+    testCompile "org.functionaljava:functionaljava:4.6"
+    testCompile "org.functionaljava:functionaljava-quickcheck:4.6"
+    testCompile "net.javacrumbs.json-unit:json-unit:1.18.0"
+
+    compile 'com.noveogroup.android:android-logger:1.3.1'
+
+    debugCompile 'com.facebook.stetho:stetho:1.4.2'
+    debugCompile 'com.facebook.stetho:stetho-okhttp3:1.4.2'
+}

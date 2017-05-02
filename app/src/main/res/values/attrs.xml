@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CustomToolbar">
+        <attr name="ct_title" format="string"/>
+        <attr name="ct_navigationType" format="enum">
+            <enum name="back" value="1"/>
+            <enum name="menu" value="2"/>
+        </attr>
+    </declare-styleable>
+</resources>
