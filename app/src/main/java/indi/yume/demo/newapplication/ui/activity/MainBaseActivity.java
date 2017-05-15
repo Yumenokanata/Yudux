@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import indi.yume.demo.newapplication.R;
 import indi.yume.demo.newapplication.ui.AppComponent;
 import indi.yume.demo.newapplication.ui.activity.base.BaseFragmentActivity;
+import indi.yume.demo.newapplication.ui.activity.base.SlideMenuActivity;
 import indi.yume.demo.newapplication.ui.component.DaggerMainBaseComponent;
 import indi.yume.demo.newapplication.ui.component.MainBaseComponent;
-import indi.yume.demo.newapplication.ui.fragment.goods.GoodsFragment;
 import indi.yume.demo.newapplication.ui.module.MainBaseModule;
 import indi.yume.demo.newapplication.ui.presenter.MainBasePresenter;
 
@@ -20,12 +20,13 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import indi.yume.demo.newapplication.util.SlideMenuScreensTag;
 import indi.yume.tools.fragmentmanager.BaseManagerFragment;
 
 /**
  * Created by DaggerGenerator on 2016/11/15.
  */
-public class MainBaseActivity extends BaseFragmentActivity {
+public class MainBaseActivity extends SlideMenuActivity {
     private Long exitTime = 0l;
 
     @Inject
@@ -34,17 +35,6 @@ public class MainBaseActivity extends BaseFragmentActivity {
     @Override
     protected int provideFragmentId() {
         return R.id.fragment_layout;
-    }
-
-    @NotNull
-    @Override
-    public Map<String, Class<? extends BaseManagerFragment>> baseFragmentWithTag() {
-        Map<String, Class<? extends BaseManagerFragment>> map = new HashMap<>();
-//        for (SlideMenuScreensTag tag : SlideMenuScreensTag.values())
-//            map.put(tag.getTag(), tag.getFragmentClazz());
-        map.put("default", GoodsFragment.class);
-
-        return map;
     }
 
     @Override
@@ -56,7 +46,7 @@ public class MainBaseActivity extends BaseFragmentActivity {
 //        setDefaultFragmentAnim(R.anim.activity_open_enter,
 //                R.anim.activity_close_exit,
 //                R.anim.stay_anim);
-        switchToStackByTag("default");
+        switchToStackByTag(SlideMenuScreensTag.HOME.getTag());
     }
 
     @Override

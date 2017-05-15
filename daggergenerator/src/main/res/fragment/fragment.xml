@@ -1,0 +1,65 @@
+<classMaker classVarName="fragment">
+    <extends classVarName="baseFragment"/>
+
+    <note>${note}</note>
+
+    <property valueName="presenter"
+              classVarName="presenter"
+              modifier="private">
+        <anno classVarName="inject"/>
+    </property>
+
+    <!--<method returnClassName="string" methodName="headTitle">-->
+        <!--<anno classVarName="override"/>-->
+
+        <!--<body>-->
+            <!--return "${name}Fragment";-->
+        <!--</body>-->
+    <!--</method>-->
+
+    <method returnClassName="view" methodName="onCreateView">
+        <anno classVarName="override"/>
+
+        <methodParam classVarName="layoutInflater" valueName="inflater"/>
+        <methodParam classVarName="viewGroup" valueName="container"/>
+        <methodParam classVarName="bundle" valueName="savedInstanceState"/>
+
+        <include classVarName="R"/>
+        <body>
+            View view = inflater.inflate(R.layout.${_-name}_fragment, container, false);\n
+            bind(view);\n
+            \n
+            return view;
+        </body>
+    </method>
+
+    <method returnClassName="void" methodName="onViewCreated">
+        <anno classVarName="override"/>
+
+        <methodParam classVarName="view" valueName="view"/>
+        <methodParam classVarName="bundle" valueName="savedInstanceState"/>
+
+        <body>
+            super.onViewCreated(view, savedInstanceState);\n
+            //init view at here.
+        </body>
+    </method>
+
+    <method returnClassName="void" methodName="inject">
+        <anno classVarName="override"/>
+
+        <methodParam classVarName="appComponent" valueName="appComponent"/>
+
+        <include classVarName="dagger"/>
+        <include classVarName="module"/>
+        <include classVarName="component"/>
+        <body>
+            ${name}Component ${&lt;name}Component = Dagger${name}Component.builder()\n
+                .appComponent(appComponent)\n
+                .${&lt;name}Module(new ${name}Module(this))\n
+                .build();\n
+            ${&lt;name}Component.inject${type}(this);\n
+            ${&lt;name}Component.injectPresenter(presenter);
+        </body>
+    </method>
+</classMaker>

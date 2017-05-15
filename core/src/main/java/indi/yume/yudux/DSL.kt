@@ -38,6 +38,9 @@ object DSL {
                     })
 
     @JvmStatic
+    fun <Data, State> emptyReducer(): (Data, State) -> State = { _, s -> s }
+
+    @JvmStatic
     fun <T> plus(collection: Collection<T>, element: T): List<T> = collection + element
 
     @JvmStatic

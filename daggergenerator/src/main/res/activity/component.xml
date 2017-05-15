@@ -1,0 +1,17 @@
+<classMaker classVarName="component">
+    <anno classVarName="componentAnno">
+        <param key="modules" classVarName="module"/>
+        <param key="dependencies" classVarName="appComponent"/>
+    </anno>
+    <anno classVarName="activityScope"/>
+
+    <note>${note}</note>
+
+    <method returnClassName="void" methodName="inject${type}">
+        <methodParam classVarName="activity" valueName="activity"/>
+    </method>
+
+    <method returnClassName="void" methodName="injectPresenter">
+        <methodParam classVarName="presenter" valueName="presenter"/>
+    </method>
+</classMaker>

@@ -1,0 +1,56 @@
+<config>
+    <!-- Common Start -->
+    <annotation name="inject" packageName="javax.inject" className="Inject"/>
+    <annotation name="provides" packageName="dagger" className="Provides"/>
+    <annotation name="override" packageName="" className="Override"/>
+
+    <class name="layoutInflater" packageName="android.view" className="LayoutInflater"/>
+    <class name="viewGroup" packageName="android.view" className="ViewGroup"/>
+    <class name="bundle" packageName="android.os" className="Bundle"/>
+    <class name="supportV4Fragment" packageName="android.support.v4.app" className="Fragment"/>
+    <class name="activity" packageName="android.app" className="Activity"/>
+    <class name="view" packageName="android.view" className="View"/>
+    <class name="void" packageName="" className="void"/>
+    <class name="context" packageName="android.content" className="Context"/>
+    <class name="butterknife" packageName="butterknife" className="ButterKnife"/>
+
+    <class name="string" packageName="" className="String"/>
+    <!-- Common End -->
+
+    <!-- Public Start -->
+    <annotation name="activityScope" packageName="${basePackage}${diPackage}" className="ActivityScope"/>
+    <class name="appComponent" packageName="${basePackage}${uiPackage}" className="AppComponent"/>
+    <class name="R" packageName="${basePackage}" className="R"/>
+
+    <class name="dagger" packageName="${basePackage}${componentPackage}" className="Dagger${name}Component"/>
+    <!-- Public End -->
+
+    <!-- Activity Start -->
+    <class name="activity" packageName="${basePackage}${activityPackage}" className="${name}Activity"/>
+    <class name="baseActivity" packageName="${basePackage}${activityPackage}.base" className="BaseActivity"/>
+    <!-- Activity End -->
+
+    <!-- Fragment Start -->
+    <class name="baseFragment" packageName="${basePackage}${fragmentPackage}.base" className="BaseToolbarFragment"/>
+    <class name="fragment" packageName="${basePackage}${fragmentPackage}" className="${name}Fragment"/>
+    <interface name="fragmentInner" packageName="${basePackage}${fragmentPackage}.${name}Fragment.${name}Listener" className="${name}Fragment.${name}Listener"/>
+    <!-- Fragment End -->
+
+    <!-- Presenter Start -->
+    <class name="presenter" packageName="${basePackage}${presenterPackage}" className="${name}Presenter"/>
+    <class name="basePresenter" packageName="${basePackage}${presenterPackage}" className="BasePresenter"/>
+    <!--<interface name="presenterInterface" packageName="" className="${name}Listener"/>-->
+    <!--<interface isInner="true" name="presenterGetInterface" packageName="${basePackage}${presenterPackage}.${name}Presenter" className="${name}Presenter.${name}Listener"/>-->
+    <!-- Presenter End -->
+
+    <!-- Component Start -->
+    <interface name="component" packageName="${basePackage}${componentPackage}" className="${name}Component"/>
+    <annotation name="componentAnno" packageName="dagger" className="Component"/>
+    <!-- Component End -->
+
+    <!-- Module Start -->
+    <class name="module" packageName="${basePackage}${modulePackage}" className="${name}Module"/>
+    <class name="baseModule" packageName="${basePackage}${modulePackage}" className="BaseModule"/>
+    <annotation name="moduleAnno" packageName="dagger" className="Module"/>
+    <!-- Module End -->
+</config>

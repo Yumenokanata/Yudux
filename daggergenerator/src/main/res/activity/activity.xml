@@ -1,0 +1,42 @@
+<classMaker classVarName="activity">
+    <extends classVarName="baseActivity"/>
+
+    <note>${note}</note>
+
+    <property valueName="presenter"
+              classVarName="presenter"
+              modifier="private">
+        <anno classVarName="inject"/>
+    </property>
+
+    <method returnClassName="void" methodName="onCreate">
+        <anno classVarName="override"/>
+
+        <methodParam classVarName="bundle" valueName="savedInstanceState"/>
+
+        <include classVarName="R"/>
+        <body>
+            setContentView(R.layout.${_-name}_activity);\n
+            super.onCreate(savedInstanceState);\n
+
+        </body>
+    </method>
+
+    <method returnClassName="void" methodName="inject">
+        <anno classVarName="override"/>
+
+        <methodParam classVarName="appComponent" valueName="appComponent"/>
+
+        <include classVarName="dagger"/>
+        <include classVarName="module"/>
+        <include classVarName="component"/>
+        <body>
+            ${name}Component ${&lt;name}Component = Dagger${name}Component.builder()\n
+            .appComponent(appComponent)\n
+            .${&lt;name}Module(new ${name}Module(this))\n
+            .build();\n
+            ${&lt;name}Component.inject${type}(this);\n
+            ${&lt;name}Component.injectPresenter(presenter);
+        </body>
+    </method>
+</classMaker>

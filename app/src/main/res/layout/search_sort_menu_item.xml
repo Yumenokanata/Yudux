@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="?selectableItemBackground"
+    android:button="@null"
+    android:drawableLeft="@drawable/sort_menu_icon"
+    android:drawablePadding="-20dp"
+    android:gravity="center"
+    android:padding="16dp"
+    android:textAlignment="center"
+    android:textColor="@color/sort_menu_text_colot"
+    android:textSize="16sp"
+    tools:text="おすすめ順" />

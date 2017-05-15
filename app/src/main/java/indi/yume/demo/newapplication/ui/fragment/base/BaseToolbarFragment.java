@@ -12,6 +12,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 //import indi.yume.tools.fragmentmanager.OnShowMode;
+import indi.yume.demo.newapplication.ui.activity.base.SlideMenuActivity;
 import indi.yume.demo.newapplication.widget.CustomToolbar;
 
 import static indi.yume.demo.newapplication.widget.CustomToolbar.TOOLBAR_MODE_MENU;
@@ -39,9 +40,8 @@ public abstract class BaseToolbarFragment extends BaseFragment {
     protected void doForToolbar(CustomToolbar toolbar) {
         toolbar.initListener();
         toolbar.setDoOnClickBackButton(this::finish);
-//        toolbar.setDoOnClickMenuButton(() -> ((SlideMenuActivity) getActivity()).openSlideMenu());
+        toolbar.setDoOnClickMenuButton(() -> ((SlideMenuActivity) getActivity()).openSlideMenu());
         toolbar.setDoOnClickCloseButton(this::finish);
-
     }
 
     protected void setToolbarMode(@CustomToolbar.ToolbarMode int mode) {

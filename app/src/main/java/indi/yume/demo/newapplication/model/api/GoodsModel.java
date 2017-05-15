@@ -4,23 +4,49 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Created by yume on 16-4-12.
  */
 @Data
-@NoArgsConstructor
 public class GoodsModel implements Parcelable {
     private String name;
     private String barCode;
     private float salePrice;
     private float costPrice;
-    private int count = 0;
+    private int count;
     private String unit;
     private int packageNum;
     private String note;
     private String className;
+
+    protected GoodsModel(Parcel in) {
+        name = in.readString();
+        barCode = in.readString();
+        salePrice = in.readFloat();
+        costPrice = in.readFloat();
+        count = in.readInt();
+        unit = in.readString();
+        packageNum = in.readInt();
+        note = in.readString();
+        className = in.readString();
+    }
+
+    public GoodsModel(){
+
+    }
+
+    public static final Creator<GoodsModel> CREATOR = new Creator<GoodsModel>() {
+        @Override
+        public GoodsModel createFromParcel(Parcel in) {
+            return new GoodsModel(in);
+        }
+
+        @Override
+        public GoodsModel[] newArray(int size) {
+            return new GoodsModel[size];
+        }
+    };
 
     @Override
     public int describeContents() {
@@ -40,27 +66,5 @@ public class GoodsModel implements Parcelable {
         dest.writeString(this.className);
     }
 
-    protected GoodsModel(Parcel in) {
-        this.name = in.readString();
-        this.barCode = in.readString();
-        this.salePrice = in.readFloat();
-        this.costPrice = in.readFloat();
-        this.count = in.readInt();
-        this.unit = in.readString();
-        this.packageNum = in.readInt();
-        this.note = in.readString();
-        this.className = in.readString();
-    }
 
-    public static final Parcelable.Creator<GoodsModel> CREATOR = new Parcelable.Creator<GoodsModel>() {
-        @Override
-        public GoodsModel createFromParcel(Parcel source) {
-            return new GoodsModel(source);
-        }
-
-        @Override
-        public GoodsModel[] newArray(int size) {
-            return new GoodsModel[size];
-        }
-    };
 }

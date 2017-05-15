@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    tools:context="indi.yume.demo.newapplication.ui.fragment.search.SearchFragment">
+    <data>
+        <variable
+            name="model"
+            type="indi.yume.demo.newapplication.ui.fragment.search.SearchState"/>
+        <variable
+            name="handler"
+            type="indi.yume.demo.newapplication.ui.fragment.search.SearchHandler"/>
+        <variable
+            name="searchHandler"
+            type="indi.yume.demo.newapplication.component.shopsearch.Handler"/>
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_wh">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <indi.yume.demo.newapplication.widget.CustomToolbar
+                    style="@style/ToolbarStyle"
+                    android:id="@+id/toolbar"
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    app:ct_navigationType="menu"
+                    app:ct_title="@string/title_activity_search"/>
+
+            </RelativeLayout>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" >
+
+            <include layout="@layout/shop_search_layout"
+                android:id="@+id/search_frame_layout"
+                bind:handler="@{searchHandler}"/>
+
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:id="@+id/swipe_refresh_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/shop_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </android.support.v4.widget.SwipeRefreshLayout>
+
+        </LinearLayout>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</layout>

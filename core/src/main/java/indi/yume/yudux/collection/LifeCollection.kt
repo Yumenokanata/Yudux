@@ -228,7 +228,7 @@ class ContextCollection<Key>(private var providerList: Map<Key, Module<Key, *>> 
             for ((key, value) in readyData.providerList) {
                 var newModule = value
                 for((k, _) in readyData.readyMap)
-                    newModule = value.ready(k)
+                    newModule = newModule.ready(k)
 
                 val result = newModule.isReady
                 if (result is Right && !newModule.isInit) {

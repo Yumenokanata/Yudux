@@ -1,5 +1,6 @@
 buildscript {
     ext.dbflow_version = "4.0.0-beta5"
+    ext.support_version = "25.3.1"
     repositories {
         mavenCentral()
         jcenter()
@@ -39,12 +40,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    productFlavors{
+    productFlavors {
         staging {
-            buildConfigField "String", "BASE_URL", "\"http://192.168.0.121:8080/fenrir/admin/\""
+            buildConfigField "String", "BASE_URL", "\"http://192.168.0.121:8080/fenrir/staff/\""
         }
         production {
-            buildConfigField "String", "BASE_URL", "\"http://yume.fenrir-inc.cn:8080/fenrir/admin/\""
+            buildConfigField "String", "BASE_URL", "\"http://yume.fenrir-inc.cn:8080/fenrir/staff/\""
         }
     }
 
@@ -58,16 +59,27 @@ android {
     }
 }
 
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(":core")
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:support-annotations:25.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:support-v4:25.3.1'
+    compile "com.android.support:appcompat-v7:${support_version}"
+    compile "com.android.support:design:${support_version}"
+    compile "com.android.support:support-annotations:${support_version}"
+    compile "com.android.support.constraint:constraint-layout:1.0.2"
+    compile "com.android.support:support-v4:${support_version}"
+    compile "com.android.support:cardview-v7:${support_version}"
+    compile "com.android.support:recyclerview-v7:${support_version}"
     compile 'com.android.support:multidex:1.0.1'
+
+    compile(name: 'dsladapter', ext: 'aar')
+    compile(name: 'dsldatabind', ext: 'aar')
 
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
@@ -99,28 +111,24 @@ dependencies {
     compile "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
     compile "com.github.Raizlabs.DBFlow:dbflow:${dbflow_version}"
 
-    compile 'com.annimon:stream:1.1.6'
+    compile 'com.annimon:stream:1.1.7'
     compile 'com.google.guava:guava:20.0'
 
     compile 'com.github.brianegan.bansa:bansa:1.0.0-beta'
-    compile 'co.trikita:anvil-sdk15:0.5.0'
-    compile 'co.trikita:anvil-design:0.5.0'
-    compile 'co.trikita:anvil-support-v4:0.5.0'
-    compile 'co.trikita:anvil-recyclerview-v7:0.5.0'
 
     compile 'com.github.Yumenokanata:AutoSharedPref:2.0.1'
     compile ('com.github.Yumenokanata:FragmentManager:f4819efa20') {
         exclude group: 'org.slf4j', module: 'slf4j-simple'
     }
-    compile 'com.github.Yumenokanata.AvocadoViews:loadinglayout:2.0.1'
-    compile 'com.github.Yumenokanata.AvocadoViews:dsladapter:2.0.1'
-    compile 'com.github.Yumenokanata.AvocadoViews:adapterdatabinding:2.0.1'
-    compile 'com.github.Yumenokanata.AvocadoViews:statuslayout:2.0.1'
+    compile 'com.github.Yumenokanata.AvocadoViews:loadinglayout:1bfa68c942'
+    compile 'com.github.Yumenokanata.AvocadoViews:dsladapter:1bfa68c942'
+    compile 'com.github.Yumenokanata.AvocadoViews:adapterdatabinding:1bfa68c942'
+    compile 'com.github.Yumenokanata.AvocadoViews:statuslayout:1bfa68c942'
     compile 'com.github.Yumenokanata:KeyboardVisibilityEvent:1.1'
 
-    androidTestCompile 'com.android.support:appcompat-v7:25.3.1'
-    androidTestCompile 'com.android.support:design:25.3.1'
-    androidTestCompile 'com.android.support:support-annotations:25.3.1'
+    androidTestCompile "com.android.support:appcompat-v7:${support_version}"
+    androidTestCompile "com.android.support:design:${support_version}"
+    androidTestCompile "com.android.support:support-annotations:${support_version}"
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
@@ -135,4 +143,6 @@ dependencies {
 
     debugCompile 'com.facebook.stetho:stetho:1.4.2'
     debugCompile 'com.facebook.stetho:stetho-okhttp3:1.4.2'
+
+    compile 'com.rengwuxian.materialedittext:library:2.1.4'
 }

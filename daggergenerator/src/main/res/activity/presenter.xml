@@ -1,0 +1,5 @@
+<classMaker classVarName="presenter">
+    <extends classVarName="basePresenter"/>
+
+    <note>${note}</note>
+</classMaker>

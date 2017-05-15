@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="indi.yume.demo.newapplication.ui.fragment.home.HomeFragment">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="state"
+            type="indi.yume.demo.newapplication.ui.fragment.home.HomeState"/>
+        <variable
+            name="handler"
+            type="indi.yume.demo.newapplication.ui.fragment.home.HomeHandler"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_wh"
+        android:orientation="vertical">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <indi.yume.demo.newapplication.widget.CustomToolbar
+                    style="@style/ToolbarStyle"
+                    android:id="@+id/toolbar"
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    app:ct_navigationType="menu"
+                    app:ct_title="@string/title_activity_home"/>
+
+            </RelativeLayout>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/color_gr7">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@color/color_wh"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:layout_margin="15dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="总商品"
+                            android:textSize="20sp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text='@{state.getGoodsCount() + "种"}'
+                            tools:text="30种"
+                            android:textSize="17sp"
+                            android:layout_marginTop="10dp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@color/color_wh"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:layout_margin="15dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="余额"
+                            android:textSize="20sp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text='@{String.format("%.2f 元", state.getMoney())}'
+                            tools:text="30.02元"
+                            android:textSize="17sp"
+                            android:layout_marginTop="10dp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <indi.yume.demo.newapplication.widget.ClearEditText
+                    android:id="@+id/keyword_search_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/home_key_word_back"
+                    android:drawableLeft="@drawable/ic_search"
+                    android:drawablePadding="11dp"
+                    android:hint="检索"
+                    android:imeOptions="actionSearch"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:singleLine="true"
+                    android:textColorHint="@color/color_gr4" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="20dp"
+                    android:visibility="@{state.getLastPay() == null || state.getLastPay().isEmpty() ? View.GONE : View.VISIBLE}">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:paddingLeft="15dp"
+                        android:text="最近一单"
+                        android:textColor="@color/white"
+                        android:background="@color/simple_red"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:paddingRight="15dp"
+                        android:gravity="right"
+                        android:text='@{state.getLastPayTime()}'
+                        android:textColor="@color/color_gr2"
+                        android:textSize="16sp"
+                        tools:text="2017年4月5日 15:4:23"/>
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/last_pay_list_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="20dp"
+                    android:visibility="@{state.getNewArrival() == null ? View.GONE : View.VISIBLE}">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:paddingLeft="15dp"
+                        android:text="最新上架"
+                        android:textColor="@color/white"
+                        android:background="@color/simple_red"/>
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/new_arrival_list_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </android.support.v4.widget.NestedScrollView>
+
+    </LinearLayout>
+</layout>

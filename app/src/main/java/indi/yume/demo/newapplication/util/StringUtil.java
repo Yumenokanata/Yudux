@@ -4,7 +4,10 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.StrikethroughSpan;
 
 import com.annimon.stream.Optional;
 
@@ -304,11 +307,9 @@ public class StringUtil {
         }
     }
 
-    public static String jobIdWithoutJ(String id) {
-        return id.replace("J", "");
-    }
-
-    public static String jobIdWithJ(String id) {
-        return "J" + jobIdWithoutJ(id);
+    public static SpannableString deleteLineText(String string) {
+        SpannableString spannableString = new SpannableString(string);
+        spannableString.setSpan(new StrikethroughSpan(), 0, string.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        return spannableString;
     }
 }

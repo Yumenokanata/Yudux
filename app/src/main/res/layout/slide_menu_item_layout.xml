@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="itemBack" type="android.graphics.drawable.Drawable"/>
+        <variable name="textColor" type="android.content.res.ColorStateList"/>
+        <variable name="iconSrc" type="android.graphics.drawable.Drawable"/>
+        <variable name="itemText" type="String"/>
+        <variable name="selected" type="Boolean"/>
+        <variable name="handler" type="indi.yume.demo.newapplication.functions.Receiver"/>
+    </data>
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/slide_item_back_layout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:selected="@{selected}"
+        android:background="@{itemBack}"
+        android:onClick="@{(view) -> handler.accept(view)}">
+
+        <ImageView
+            android:id="@+id/slide_menu_item_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="16dp"
+            app:selected="@{selected}"
+
+            android:src="@{iconSrc}" />
+
+        <TextView
+            android:id="@+id/slide_menu_item_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:selected="@{selected}"
+
+            android:layout_marginLeft="72dp"
+            android:text="@{itemText}"
+            tools:text="@string/slide_scan"
+            android:textColor="@{textColor}"
+
+            android:textSize="@dimen/slide_menu_item_text_size" />
+
+    </FrameLayout>
+</layout>

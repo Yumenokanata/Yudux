@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="indi.yume.demo.newapplication.ui.activity.login.LoginActivity">
+    <data>
+        <variable
+            name="login"
+            type="indi.yume.demo.newapplication.ui.activity.login.LoginState"/>
+        <variable
+            name="hanlder"
+            type="indi.yume.demo.newapplication.ui.activity.login.LoginHandler"/>
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_margin="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_margin="24dp"
+                        android:src="@mipmap/splash_logo" />
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:layout_marginBottom="8dp">
+
+                        <com.rengwuxian.materialedittext.MaterialEditText
+                            android:singleLine="true"
+                            android:imeOptions="actionNext"
+                            android:id="@+id/username_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/login_username"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/bg_color"
+                            android:textSize="16sp"
+                            app:met_singleLineEllipsis="true"
+                            tools:text="Admintest" />
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginBottom="8dp">
+
+                        <com.rengwuxian.materialedittext.MaterialEditText
+                            android:singleLine="true"
+                            android:imeOptions="actionGo"
+                            android:id="@+id/userpass_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/login_password"
+                            android:inputType="textPassword"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/bg_color"
+                            android:textSize="16sp"
+                            app:met_singleLineEllipsis="true"
+                            tools:text="123456" />
+
+                    </android.support.design.widget.TextInputLayout>
+
+
+                    <Button
+                        android:id="@+id/login_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:layout_marginBottom="24dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="24dp"
+                        android:background="@color/main_color"
+                        android:backgroundTint="@color/main_color"
+                        android:text="@string/login_login"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:onClick="@{hanlder::clickLogin}"/>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+        </RelativeLayout>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</layout>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="indi.yume.demo.newapplication.util.StringUtil"/>
+        <import type="android.view.View"/>
+        <variable
+            name="model"
+            type="indi.yume.demo.newapplication.model.api.GoodsModel"/>
+        <variable name="showBtn" type="Boolean"/>
+        <variable name="clickMain" type="indi.yume.demo.newapplication.functions.Receiver"/>
+        <variable name="clickKeep" type="indi.yume.demo.newapplication.functions.Receiver"/>
+        <variable name="clickBuy" type="indi.yume.demo.newapplication.functions.Receiver"/>
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="@{(view) -> clickMain.accept(model)}">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:background="@color/color_wh">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textColor="@color/color_gr1"
+                android:text="@{model.getName()}"
+                tools:text="奥利奥"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:textSize="17sp"
+                android:text="@{model.getName()}"
+                tools:text="介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍"
+                android:layout_marginLeft="15dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="@color/color_re1"
+                    android:text='@{String.format("¥%.2f", model.getSalePrice())}'
+                    tools:text="¥10.50"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/color_gr4"
+                    app:deleteText='@{String.format("¥%.2f", model.getCostPrice())}'
+                    tools:text="¥20.50"
+                    android:layout_marginLeft="10dp"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:textSize="17sp"
+                    android:textColor="@color/color_gr2"
+                    android:text='@{String.format("库存:%d", model.getCount())}'
+                    tools:text="库存:10"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#81000000"
+            android:visibility="@{showBtn ? View.VISIBLE : View.GONE}">
+
+            <LinearLayout
+                android:id="@+id/btn_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="6dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:background="@drawable/keep_btn_back"
+                    android:text="收藏"
+                    android:textColor="@color/color_bk"
+                    android:textSize="15sp"
+                    android:padding="5dp"
+                    android:onClick="@{(view) -> clickKeep.accept(model)}"/>
+
+                <TextView
+                    android:id="@+id/buy_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:background="@drawable/buy_btn_back"
+                    android:text="购买"
+                    android:textColor="@color/color_bk"
+                    android:textSize="15sp"
+                    android:padding="5dp"
+                    android:layout_marginLeft="20dp"
+                    android:onClick="@{(view) -> clickBuy.accept(model)}"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </FrameLayout>
+</layout>

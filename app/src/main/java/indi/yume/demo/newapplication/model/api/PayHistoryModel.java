@@ -1,32 +1,41 @@
 package indi.yume.demo.newapplication.model.api;
 
-import java.io.Serializable;
 import java.util.List;
 
 import lombok.Data;
 
 /**
- * Created by sashiro on 16/5/16.
+ * Created by sashiro on 16/5/11.
  */
 @Data
 public class PayHistoryModel {
-    private List<HistoryEntry> history;
-    private float sumSpend;
+
+    private List<History> history;
+
+    private double sumSpend;
 
     @Data
-    public static class HistoryEntry implements Serializable {
+    public class History {
         private String payTime;
+
         private int staffId;
+
         private int payCount;
-        private float spend;
+
+        private double spend;
+
         private String historyToken;
-        private List<GoodsData> payGoods;
+
+        private List<PayGoods> payGoods;
     }
 
     @Data
-    public static class GoodsData {
+    public class PayGoods {
         private GoodsModel goodsData;
+
         private int payCount;
-        private float spend;
+
+        private double spend;
     }
 }
+

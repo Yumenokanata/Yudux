@@ -8,12 +8,11 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import indi.yume.demo.newapplication.manager.api.BarCodeService;
-import indi.yume.demo.newapplication.manager.api.ChargeService;
-import indi.yume.demo.newapplication.manager.api.GoodsService;
-import indi.yume.demo.newapplication.manager.api.HistoryService;
+import indi.yume.demo.newapplication.manager.api.ChargeHistoryService;
+import indi.yume.demo.newapplication.manager.api.PayGoodsService;
+import indi.yume.demo.newapplication.manager.api.PayHistoryService;
+import indi.yume.demo.newapplication.manager.api.SearchGoodsService;
 import indi.yume.demo.newapplication.manager.api.UserService;
-import indi.yume.demo.newapplication.manager.api.WarehouseService;
 import lombok.val;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -53,37 +52,31 @@ public class ApiModule {
 
     @Singleton
     @Provides
-    public GoodsService provideSearchService(Retrofit retrofit){
-        return retrofit.create(GoodsService.class);
+    public SearchGoodsService provideSearchService(ApiClient client) {
+        return client.createService(SearchGoodsService.class);
     }
 
     @Singleton
     @Provides
-    public UserService provideUserService(Retrofit retrofit){
-        return retrofit.create(UserService.class);
+    public UserService provideUserService(ApiClient client) {
+        return client.createService(UserService.class);
     }
 
     @Singleton
     @Provides
-    public ChargeService provideChargeService(Retrofit retrofit){
-        return retrofit.create(ChargeService.class);
+    public PayGoodsService providePayGoodsService(ApiClient client) {
+        return client.createService(PayGoodsService.class);
     }
 
     @Singleton
     @Provides
-    public HistoryService provideHistoryService(Retrofit retrofit) {
-        return retrofit.create(HistoryService.class);
+    public PayHistoryService providePayHistoryService(ApiClient client) {
+        return client.createService(PayHistoryService.class);
     }
 
     @Singleton
     @Provides
-    public WarehouseService provideWarehouseService(Retrofit retrofit) {
-        return retrofit.create(WarehouseService.class);
-    }
-
-    @Singleton
-    @Provides
-    public BarCodeService provideBarCodeService(Retrofit retrofit) {
-        return retrofit.create(BarCodeService.class);
+    public ChargeHistoryService provideChargeHistoryService(ApiClient client) {
+        return client.createService(ChargeHistoryService.class);
     }
 }

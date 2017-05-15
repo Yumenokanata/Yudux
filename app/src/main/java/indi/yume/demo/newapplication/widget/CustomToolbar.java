@@ -11,12 +11,10 @@ import android.util.AttributeSet;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import indi.yume.demo.newapplication.R;
-import io.reactivex.functions.Action;
+import indi.yume.yudux.functions.Effect;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-//import rx.functions.Action;
 
 /**
  * Created by yume on 16-6-24.
@@ -35,9 +33,9 @@ public class CustomToolbar extends Toolbar {
     @ToolbarMode
     private int mode = TOOLBAR_MODE_BACK;
 
-    private Optional<Action> doOnClickBackButton = Optional.empty();
-    private Optional<Action> doOnClickMenuButton = Optional.empty();
-    private Optional<Action> doOnClickCloseButton = Optional.empty();
+    private Optional<Effect> doOnClickBackButton = Optional.empty();
+    private Optional<Effect> doOnClickMenuButton = Optional.empty();
+    private Optional<Effect> doOnClickCloseButton = Optional.empty();
 
     public CustomToolbar(Context context) {
         this(context, null);
@@ -97,28 +95,28 @@ public class CustomToolbar extends Toolbar {
         return mode;
     }
 
-    public void setDoOnClickBackButton(Action onClickBackButton) {
+    public void setDoOnClickBackButton(Effect onClickBackButton) {
         doOnClickBackButton = Optional.ofNullable(onClickBackButton);
     }
 
-    public void setDoOnClickMenuButton(Action onClickMenuButton) {
+    public void setDoOnClickMenuButton(Effect onClickMenuButton) {
         doOnClickMenuButton = Optional.ofNullable(onClickMenuButton);
     }
 
-    public void setDoOnClickCloseButton(Action onClickCloseButton) {
+    public void setDoOnClickCloseButton(Effect onClickCloseButton) {
         doOnClickCloseButton = Optional.ofNullable(onClickCloseButton);
     }
 
     private void onClickNavigation() {
         switch (mode) {
             case TOOLBAR_MODE_BACK:
-//                doOnClickBackButton.ifPresent(Action::run);
+                doOnClickBackButton.ifPresent(Effect::run);
                 break;
             case TOOLBAR_MODE_MENU:
-//                doOnClickMenuButton.ifPresent(Action::run);
+                doOnClickMenuButton.ifPresent(Effect::run);
                 break;
             case TOOLBAR_MODE_CLOSE:
-//                doOnClickCloseButton.ifPresent(Action::run);
+                doOnClickCloseButton.ifPresent(Effect::run);
                 break;
         }
     }
