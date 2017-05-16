@@ -1,36 +1,50 @@
-<android.support.design.widget.CoordinatorLayout
+<?xml version="1.0" encoding="utf-8"?>
+<layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/color_wh"
-    tools:context="${basePackage}${fragmentPackage}.${name}Fragment">
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    tools:context="${basePackage}${fragmentPackage}.${-name}.${name}Fragment">
+    <data>
+        <variable
+            name="model"
+            type="${basePackage}${fragmentPackage}.${-name}.${name}State"/>
+        <variable
+            name="handler"
+            type="${basePackage}${fragmentPackage}.${-name}.${name}Handler"/>
+    </data>
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <indi.yume.demo.newapplication.widget.CustomToolbar
-                style="@style/ToolbarStyle"
-                android:id="@+id/toolbar"
-                app:layout_scrollFlags="scroll|enterAlways"
-                app:ct_navigationType="menu"
-                app:ct_title="@string/title_activity_home"/>
-
-        </RelativeLayout>
-
-    </android.support.design.widget.AppBarLayout>
-
-    <TextView
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/app_name"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:background="@color/color_wh" >
 
-</android.support.design.widget.CoordinatorLayout>
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <indi.yume.demo.newapplication.widget.CustomToolbar
+                    style="@style/ToolbarStyle"
+                    android:id="@+id/toolbar"
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    app:ct_navigationType="menu"
+                    app:ct_title="@string/title_activity_home"/>
+
+            </RelativeLayout>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/app_name"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</layout>

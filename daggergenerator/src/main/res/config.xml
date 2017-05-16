@@ -26,15 +26,23 @@
     <!-- Public End -->
 
     <!-- Activity Start -->
-    <class name="activity" packageName="${basePackage}${activityPackage}" className="${name}Activity"/>
+    <class name="activity" packageName="${basePackage}${activityPackage}.${-name}" className="${name}Activity"/>
     <class name="baseActivity" packageName="${basePackage}${activityPackage}.base" className="BaseActivity"/>
     <!-- Activity End -->
 
     <!-- Fragment Start -->
     <class name="baseFragment" packageName="${basePackage}${fragmentPackage}.base" className="BaseToolbarFragment"/>
-    <class name="fragment" packageName="${basePackage}${fragmentPackage}" className="${name}Fragment"/>
-    <interface name="fragmentInner" packageName="${basePackage}${fragmentPackage}.${name}Fragment.${name}Listener" className="${name}Fragment.${name}Listener"/>
+    <class name="fragment" packageName="${basePackage}${fragmentPackage}.${-name}" className="${name}Fragment"/>
+    <interface name="fragmentInner" packageName="${basePackage}${fragmentPackage}.${-name}.${name}Fragment.${name}Listener" className="${name}Fragment.${name}Listener"/>
     <!-- Fragment End -->
+
+    <!-- Handler Start -->
+    <class name="handler" packageName="${basePackage}${fragmentPackage}.${-name}.${name}Handler" className="${name}Handler"/>
+    <!-- Fragment End -->
+
+    <!-- State Start -->
+    <class name="state" packageName="${basePackage}${fragmentPackage}.${-name}.${name}State" className="${name}State"/>
+    <!-- State End -->
 
     <!-- Presenter Start -->
     <class name="presenter" packageName="${basePackage}${presenterPackage}" className="${name}Presenter"/>

@@ -7,7 +7,7 @@ import java.util.List;
 import indi.yume.demo.newapplication.component.shopsearch.Handler;
 import indi.yume.demo.newapplication.databinding.SearchFragmentBinding;
 import indi.yume.demo.newapplication.model.api.GoodsModel;
-import indi.yume.demo.newapplication.ui.fragment.AppState;
+import indi.yume.demo.newapplication.ui.AppState;
 import indi.yume.demo.newapplication.ui.presenter.SearchPresenter;
 import indi.yume.yudux.collection.BaseDependAction;
 import indi.yume.yudux.collection.DependsStore;

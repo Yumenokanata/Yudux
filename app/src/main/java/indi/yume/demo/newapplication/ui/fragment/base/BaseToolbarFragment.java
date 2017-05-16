@@ -3,27 +3,21 @@ package indi.yume.demo.newapplication.ui.fragment.base;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.MenuRes;
-import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 
-import javax.inject.Inject;
-
-import butterknife.BindView;
 //import indi.yume.tools.fragmentmanager.OnShowMode;
 import indi.yume.demo.newapplication.R;
 import indi.yume.demo.newapplication.ui.MainApplication;
 import indi.yume.demo.newapplication.ui.activity.base.SlideMenuActivity;
-import indi.yume.demo.newapplication.ui.fragment.AppState;
+import indi.yume.demo.newapplication.ui.AppState;
 import indi.yume.demo.newapplication.widget.CustomToolbar;
 import indi.yume.tools.fragmentmanager.anno.OnHideMode;
 import indi.yume.tools.fragmentmanager.anno.OnShowMode;
 import indi.yume.yudux.collection.DependsStore;
-import indi.yume.yudux.functions.Unit;
 
 import static indi.yume.demo.newapplication.ui.fragment.base.BaseToolbarFragment.BaseToolKey.*;
 import static indi.yume.demo.newapplication.widget.CustomToolbar.TOOLBAR_MODE_MENU;

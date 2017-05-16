@@ -1,0 +1,20 @@
+package ${basePackage}${fragmentPackage}.${-name};
+
+import ${basePackage}.databinding.${>name}FragmentBinding;
+import ${basePackage}.ui.AppState;
+
+import indi.yume.yudux.collection.BaseDependAction;
+import indi.yume.yudux.collection.DependsStore;
+import lombok.RequiredArgsConstructor;
+
+import static ${basePackage}${fragmentPackage}.${-name}.${name}Fragment.${name}Key.*;
+import static indi.yume.yudux.DSL.*;
+
+/**
+ * Created by DaggerGenerator on ${date}.
+ */
+@RequiredArgsConstructor
+public class ${name}Handler {
+    private final DependsStore<${name}Fragment.${name}Key, AppState> store;
+
+}

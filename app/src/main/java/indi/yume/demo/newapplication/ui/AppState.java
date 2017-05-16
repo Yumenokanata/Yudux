@@ -1,8 +1,6 @@
-package indi.yume.demo.newapplication.ui.fragment;
+package indi.yume.demo.newapplication.ui;
 
 import android.support.annotation.Nullable;
-
-import com.google.common.collect.ImmutableMap;
 
 import indi.yume.demo.newapplication.model.api.UserModel;
 import indi.yume.demo.newapplication.ui.activity.login.LoginState;

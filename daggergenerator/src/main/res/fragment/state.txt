@@ -1,0 +1,14 @@
+package ${basePackage}${fragmentPackage}.${-name};
+
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Wither;
+
+/**
+ * Created by yume on ${date}.
+ */
+@Data
+@RequiredArgsConstructor
+public class ${name}State {
+
+}

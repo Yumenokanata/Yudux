@@ -8,7 +8,7 @@ import indi.yume.demo.newapplication.databinding.LoginActivityBinding;
 import indi.yume.demo.newapplication.model.api.UserModel;
 import indi.yume.demo.newapplication.ui.activity.MainBaseActivity;
 import indi.yume.demo.newapplication.ui.activity.login.LoginActivity.LoginKey;
-import indi.yume.demo.newapplication.ui.fragment.AppState;
+import indi.yume.demo.newapplication.ui.AppState;
 import indi.yume.demo.newapplication.ui.presenter.LoginPresenter;
 import indi.yume.demo.newapplication.util.DealErrorUtil;
 import indi.yume.demo.newapplication.util.DialogUtil;

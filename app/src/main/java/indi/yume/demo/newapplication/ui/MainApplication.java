@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.multidex.MultiDex;
 
 //import indi.yume.tools.fragmentmanager.ThrottleUtil;
-import indi.yume.demo.newapplication.ui.fragment.AppState;
 import indi.yume.yudux.store.Store;
 import lombok.Getter;
 import lombok.Setter;

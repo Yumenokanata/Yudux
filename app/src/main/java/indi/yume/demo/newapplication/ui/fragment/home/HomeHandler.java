@@ -10,7 +10,7 @@ import java.util.List;
 
 import indi.yume.demo.newapplication.model.api.GoodsModel;
 import indi.yume.demo.newapplication.model.api.PayHistoryModel;
-import indi.yume.demo.newapplication.ui.fragment.AppState;
+import indi.yume.demo.newapplication.ui.AppState;
 import indi.yume.demo.newapplication.ui.fragment.home.HomeFragment.HomeKey;
 import indi.yume.demo.newapplication.ui.presenter.HomePresenter;
 import indi.yume.demo.newapplication.util.DealErrorUtil;

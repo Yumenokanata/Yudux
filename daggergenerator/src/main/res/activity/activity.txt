@@ -1,0 +1,76 @@
+package ${basePackage}${activityPackage}.${-name};
+
+import android.databinding.DataBindingUtil;
+import android.os.Bundle;
+
+import ${basePackage}.R;
+import ${basePackage}.databinding.${>name}ActivityBinding;
+import ${basePackage}.ui.AppComponent;
+import ${basePackage}.ui.MainApplication;
+import ${basePackage}${activityPackage}.base.BaseActivity;
+import ${basePackage}${componentPackage}.Dagger${name}Component;
+import ${basePackage}${componentPackage}.${name}Component;
+import ${basePackage}.ui.AppState;
+import ${basePackage}${modulePackage}.${name}Module;
+import ${basePackage}${presenterPackage}.${name}Presenter;
+import indi.yume.yudux.collection.DependsStore;
+
+import static ${basePackage}${activityPackage}.${<name}.${name}Activity.${name}Key.*;
+import static indi.yume.yudux.DSL.*;
+
+/**
+ * Created by DaggerGenerator on ${date}.
+ */
+public class ${name}Activity extends BaseActivity {
+    enum ${name}Key {
+        ACTIVITY,
+        PRESENTER,
+        BINDER,
+        HANDLER
+    }
+
+    private final DependsStore<${name}Key, AppState> store =
+            DependsStore.<${name}Key, AppState>builder(MainApplication.getMainStore())
+                    .withItem(BINDER,
+                            depends(ACTIVITY, HANDLER),
+                            (real, store) -> {
+                                ${>name}ActivityBinding binding = DataBindingUtil.setContentView(real.getItem(ACTIVITY), R.layout.${_-name}_activity);
+                                binding.setHandler(real.getItem(HANDLER));
+                                return binding;
+                            })
+                    .withItem(HANDLER,
+                            depends(),
+                            (real, store) -> new ${name}Handler(store))
+                    .withItem(PRESENTER,
+                            depends(ACTIVITY),
+                            (real, store) -> {
+                                AppComponent appComponent = MainApplication.getInstance(real.getItem(ACTIVITY)).getAppComponent();
+                                ${name}Component ${<name}Component = Dagger${name}Component.builder()
+                                        .appComponent(appComponent)
+                                        .${<name}Module(new ${name}Module(this))
+                                        .build();
+                                ${name}Presenter presenter = ${<name}Component.getPresenter();
+                                ${<name}Component.injectPresenter(presenter);
+
+                                return presenter;
+                            })
+                    .build();
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        store.ready(ACTIVITY, this);
+        super.onCreate(savedInstanceState);
+        store.forceRender();
+    }
+
+    @Override
+    protected void onDestroy() {
+        store.destroyAll();
+        super.onDestroy();
+    }
+
+    @Override
+    public void inject(AppComponent appComponent){
+
+    }
+}

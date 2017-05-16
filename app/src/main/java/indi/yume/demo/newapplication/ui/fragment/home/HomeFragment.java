@@ -21,7 +21,7 @@ import indi.yume.demo.newapplication.ui.AppComponent;
 import indi.yume.demo.newapplication.ui.MainApplication;
 import indi.yume.demo.newapplication.ui.component.DaggerHomeComponent;
 import indi.yume.demo.newapplication.ui.component.HomeComponent;
-import indi.yume.demo.newapplication.ui.fragment.AppState;
+import indi.yume.demo.newapplication.ui.AppState;
 import indi.yume.demo.newapplication.ui.fragment.base.BaseToolbarFragment;
 import indi.yume.demo.newapplication.ui.module.HomeModule;
 import indi.yume.demo.newapplication.ui.presenter.HomePresenter;

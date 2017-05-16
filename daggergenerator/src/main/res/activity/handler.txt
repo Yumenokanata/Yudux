@@ -1,0 +1,20 @@
+package ${basePackage}${activityPackage}.${-name};
+
+import ${basePackage}.databinding.${>name}ActivityBinding;
+import ${basePackage}.ui.AppState;
+
+import indi.yume.yudux.collection.BaseDependAction;
+import indi.yume.yudux.collection.DependsStore;
+import lombok.RequiredArgsConstructor;
+
+import static ${basePackage}${activityPackage}.${-name}.${name}Activity.${name}Key.*;
+import static indi.yume.yudux.DSL.*;
+
+/**
+ * Created by DaggerGenerator on ${date}.
+ */
+@RequiredArgsConstructor
+public class ${name}Handler {
+    private final DependsStore<${name}Activity.${name}Key, AppState> store;
+
+}

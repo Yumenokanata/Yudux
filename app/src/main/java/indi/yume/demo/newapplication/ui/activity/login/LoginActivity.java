@@ -10,7 +10,7 @@ import indi.yume.demo.newapplication.ui.MainApplication;
 import indi.yume.demo.newapplication.ui.activity.base.BaseActivity;
 import indi.yume.demo.newapplication.ui.component.DaggerLoginComponent;
 import indi.yume.demo.newapplication.ui.component.LoginComponent;
-import indi.yume.demo.newapplication.ui.fragment.AppState;
+import indi.yume.demo.newapplication.ui.AppState;
 import indi.yume.demo.newapplication.ui.module.LoginModule;
 import indi.yume.demo.newapplication.ui.presenter.LoginPresenter;
 import indi.yume.yudux.collection.DependsStore;

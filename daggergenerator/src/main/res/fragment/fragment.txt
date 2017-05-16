@@ -1,0 +1,98 @@
+package ${basePackage}${fragmentPackage}.${-name};
+
+import android.content.Context;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import ${basePackage}.R;
+import ${basePackage}.databinding.${name}FragmentBinding;
+import ${basePackage}.ui.AppComponent;
+import ${basePackage}.ui.MainApplication;
+import ${basePackage}${componentPackage}.Dagger${name}Component;
+import ${basePackage}${componentPackage}.${name}Component;
+import ${basePackage}.ui.AppState;
+import ${basePackage}${fragmentPackage}.base.BaseToolbarFragment;
+import ${basePackage}${modulePackage}.${name}Module;
+import ${basePackage}${presenterPackage}.${name}Presenter;
+import indi.yume.yudux.collection.DependsStore;
+
+import static ${basePackage}${fragmentPackage}.${-name}.${name}Fragment.${name}Key.*;
+import static indi.yume.yudux.DSL.*;
+
+/**
+ * Created by DaggerGenerator on ${date}.
+ */
+public class ${name}Fragment extends BaseToolbarFragment {
+    enum ${name}Key {
+        CONTEXT,
+        VIEW,
+        BINDER,
+        PRESENTER,
+        HANDLER
+    }
+
+    private final DependsStore<${name}Key, AppState> store =
+            DependsStore.<${name}Key, AppState>builder(MainApplication.getMainStore())
+                    .withItem(HANDLER,
+                            depends(),
+                            (real, store) -> new ${name}Handler(store))
+                    .withItem(BINDER,
+                            depends(VIEW, HANDLER),
+                            (real, store) -> {
+                                ${name}FragmentBinding binding = ${name}FragmentBinding.bind(real.getItem(VIEW));
+                                binding.setHandler(real.getItem(HANDLER));
+
+                                return binding;
+                            })
+                    .withItem(PRESENTER,
+                            depends(CONTEXT),
+                            (real, store) -> {
+                                AppComponent appComponent = MainApplication.getInstance(real.getItem(CONTEXT)).getAppComponent();
+                                ${name}Component ${<name}Component = Dagger${name}Component.builder()
+                                        .appComponent(appComponent)
+                                        .${<name}Module(new ${name}Module(this))
+                                        .build();
+                                ${name}Presenter presenter = ${<name}Component.getPresenter();
+                                ${<name}Component.injectPresenter(presenter);
+
+                                return presenter;
+                            })
+                    .build();
+
+    {
+        store.subscribe(depends(BINDER),
+                (state, real) -> real.<${name}FragmentBinding>getItem(BINDER).setModel(state.get${>name}State()));
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+        View view = inflater.inflate(R.layout.${_-name}_fragment, container, false);
+        store.ready(VIEW, view);
+        return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        store.ready(CONTEXT, context);
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onDetach() {
+        store.destroy(CONTEXT);
+        super.onDetach();
+    }
+
+    @Override
+    public void onDestroy() {
+        store.destroyAll();
+        super.onDestroy();
+    }
+
+    @Override
+    public void inject(AppComponent appComponent){
+
+    }
+}

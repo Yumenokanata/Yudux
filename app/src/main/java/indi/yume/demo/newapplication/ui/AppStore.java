@@ -1,4 +1,4 @@
-package indi.yume.demo.newapplication.ui.fragment;
+package indi.yume.demo.newapplication.ui;
 
 /**
  * Created by yume on 17-4-24.

@@ -34,6 +34,7 @@ public class MainGenerator {
         varStringEngine.binding("presenterPackage", ".ui.presenter");
         varStringEngine.binding("componentPackage", ".ui.component");
         varStringEngine.binding("modulePackage", ".ui.module");
+        varStringEngine.binding("date", new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime()));
 
         varStringEngine.binding("name", prefix);
 

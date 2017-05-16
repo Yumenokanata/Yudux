@@ -7,9 +7,7 @@
 
     <note>${note}</note>
 
-    <method returnClassName="void" methodName="inject${type}">
-        <methodParam classVarName="activity" valueName="activity"/>
-    </method>
+    <method returnClassName="presenter" methodName="getPresenter"/>
 
     <method returnClassName="void" methodName="injectPresenter">
         <methodParam classVarName="presenter" valueName="presenter"/>
