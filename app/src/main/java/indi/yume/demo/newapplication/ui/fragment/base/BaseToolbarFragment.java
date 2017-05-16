@@ -1,31 +1,71 @@
 package indi.yume.demo.newapplication.ui.fragment.base;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.MenuRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 //import indi.yume.tools.fragmentmanager.OnShowMode;
+import indi.yume.demo.newapplication.R;
+import indi.yume.demo.newapplication.ui.MainApplication;
 import indi.yume.demo.newapplication.ui.activity.base.SlideMenuActivity;
+import indi.yume.demo.newapplication.ui.fragment.AppState;
 import indi.yume.demo.newapplication.widget.CustomToolbar;
+import indi.yume.tools.fragmentmanager.anno.OnHideMode;
+import indi.yume.tools.fragmentmanager.anno.OnShowMode;
+import indi.yume.yudux.collection.DependsStore;
+import indi.yume.yudux.functions.Unit;
 
+import static indi.yume.demo.newapplication.ui.fragment.base.BaseToolbarFragment.BaseToolKey.*;
 import static indi.yume.demo.newapplication.widget.CustomToolbar.TOOLBAR_MODE_MENU;
+import static indi.yume.yudux.DSL.*;
 
 /**
  * Created by yume on 16-6-23.
  */
 
 public abstract class BaseToolbarFragment extends BaseFragment {
+    enum BaseToolKey {
+        ACTIVITY,
+        TOOLBAR,
+        VIEW
+    }
 
-//    @BindView(R.id.toolbar)
-    @Nullable
-    protected CustomToolbar toolbar;
+    protected final DependsStore<BaseToolKey, AppState> baseStore =
+            DependsStore.<BaseToolKey, AppState>builder(MainApplication.getMainStore())
+                    .withItem(TOOLBAR,
+                            depends(ACTIVITY, VIEW),
+                            (real, store) -> {
+                                View view = real.getItem(VIEW);
+                                CustomToolbar toolbar = (CustomToolbar) view.findViewById(R.id.toolbar);
+                                if(toolbar == null)
+                                    return null;
+                                real.<AppCompatActivity>getItem(ACTIVITY).setSupportActionBar(toolbar);
+
+                                if (toolbar.getMode() == TOOLBAR_MODE_MENU)
+                                    enableDrawer(true);
+                                else
+                                    enableDrawer(false);
+
+                                if(provideOptionMenuRes() != -1)
+                                    setHasOptionsMenu(true);
+                                else
+                                    setHasOptionsMenu(false);
+
+                                doForToolbar(toolbar);
+
+                                return toolbar;
+                            })
+                    .build();
 
     @MenuRes
     public int provideOptionMenuRes() {
@@ -37,6 +77,12 @@ public abstract class BaseToolbarFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        baseStore.ready(VIEW, view);
+        super.onViewCreated(view, savedInstanceState);
+    }
+
     protected void doForToolbar(CustomToolbar toolbar) {
         toolbar.initListener();
         toolbar.setDoOnClickBackButton(this::finish);
@@ -44,27 +90,32 @@ public abstract class BaseToolbarFragment extends BaseFragment {
         toolbar.setDoOnClickCloseButton(this::finish);
     }
 
-    protected void setToolbarMode(@CustomToolbar.ToolbarMode int mode) {
-        if (toolbar == null)
-            return;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        baseStore.ready(ACTIVITY, getActivity());
+    }
 
-        toolbar.setMode(mode);
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        baseStore.destroy(ACTIVITY);
+    }
+
+    protected void setToolbarMode(@CustomToolbar.ToolbarMode int mode) {
+        baseStore.dispatchWithDepends(effect(depends(TOOLBAR),
+                (real, oldState) -> real.<CustomToolbar>getItem(TOOLBAR).setMode(mode)));
     }
 
     protected void setToolbarTitle(@StringRes int titleRes) {
-        if (toolbar == null)
-            return;
-
-        toolbar.setTitle(titleRes);
+        baseStore.dispatchWithDepends(effect(depends(TOOLBAR),
+                (real, oldState) -> real.<CustomToolbar>getItem(TOOLBAR).setTitle(titleRes)));
     }
 
     protected void setToolbarTitle(String title) {
-        if (toolbar == null)
-            return;
-
-        toolbar.setTitle(title);
+        baseStore.dispatchWithDepends(effect(depends(TOOLBAR),
+                (real, oldState) -> real.<CustomToolbar>getItem(TOOLBAR).setTitle(title)));
     }
-
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -75,31 +126,19 @@ public abstract class BaseToolbarFragment extends BaseFragment {
         }
     }
 
-    protected void onOptionsMenuCreated(Menu menu) {
+    protected void onOptionsMenuCreated(Menu menu) {}
 
+    @Override
+    public void onHide(OnHideMode mode) {
+        super.onHide(mode);
+        baseStore.destroy(TOOLBAR);
+        baseStore.destroy(VIEW);
     }
 
+    @Override
+    public void onShow(OnShowMode mode) {
+        super.onShow(mode);
 
-//    @Override
-//    protected void onShow(int callMode) {
-//        super.onShow(callMode);
-
-//        if (toolbar != null)
-//            if (toolbar.getMode() == TOOLBAR_MODE_MENU)
-//                enableDrawer(true);
-//            else
-//                enableDrawer(false);
-
-//        if (toolbar != null && isTopOfStack() && callMode != OnShowMode.ON_CREATE_AFTER_ANIM) {
-//            if (getActivity() != null)
-//                ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-//
-//            if(provideOptionMenuRes() != -1)
-//                setHasOptionsMenu(true);
-//            else
-//                setHasOptionsMenu(false);
-//
-//            doForToolbar(toolbar);
-//        }
-//    }
+        baseStore.ready(VIEW, getView());
+    }
 }

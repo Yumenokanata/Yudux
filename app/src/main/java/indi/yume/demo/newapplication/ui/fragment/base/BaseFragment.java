@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 //import indi.yume.tools.avocado.util.DisplayUtil;
+import indi.yume.demo.newapplication.ui.activity.base.SlideMenuActivity;
 import indi.yume.tools.fragmentmanager.BaseManagerFragment;
 //import indi.yume.tools.fragmentmanager.OnHideMode;
 //import rx.Observable;
@@ -142,6 +143,11 @@ public abstract class BaseFragment extends BaseManagerFragment {
                 }
             });
         }
+    }
+
+    protected void enableDrawer(boolean enable) {
+        if(getActivity() instanceof SlideMenuActivity)
+            ((SlideMenuActivity)getActivity()).setEnableDrawer(enable);
     }
 
 //    protected <T> Observable.Transformer<T, T> showNetProgressDialog(int title){

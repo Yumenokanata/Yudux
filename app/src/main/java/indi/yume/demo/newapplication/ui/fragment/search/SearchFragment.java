@@ -3,32 +3,33 @@ package indi.yume.demo.newapplication.ui.fragment.search;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
-import com.annimon.stream.Collectors;
+import com.annimon.stream.ComparatorCompat;
 import com.annimon.stream.Stream;
 
 import java.util.Arrays;
-import java.util.Collections;
-
-import dagger.Component;
-import dagger.Module;
 
 import indi.yume.demo.newapplication.BR;
 import indi.yume.demo.newapplication.R;
 import indi.yume.demo.newapplication.databinding.SearchFragmentBinding;
-import indi.yume.demo.newapplication.databinding.ShopSearchLayoutBinding;
-import indi.yume.demo.newapplication.di.ActivityScope;
 import indi.yume.demo.newapplication.functions.Receiver;
 import indi.yume.demo.newapplication.model.api.GoodsModel;
 import indi.yume.demo.newapplication.ui.AppComponent;
@@ -44,8 +45,7 @@ import indi.yume.yudux.collection.BaseDependAction;
 import indi.yume.yudux.collection.DependsStore;
 import indi.yume.yudux.functions.Unit;
 import io.reactivex.Single;
-
-import javax.inject.Inject;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static indi.yume.demo.databinding.DataBindingDsl.dataBindingRepositoryPresenterOf;
@@ -54,6 +54,7 @@ import static indi.yume.demo.newapplication.ui.fragment.search.SearchState.*;
 import static indi.yume.tools.dsladapter2.renderer.RenderDsl.*;
 import static indi.yume.yudux.DSL.action;
 import static indi.yume.yudux.DSL.depends;
+import static indi.yume.yudux.DSL.effect;
 
 /**
  * Created by DaggerGenerator on 2017/05/15.
@@ -85,14 +86,49 @@ public class SearchFragment extends BaseToolbarFragment{
                             depends(VIEW, HANDLER, RESULT_ADAPTER),
                             (real, store) -> {
                                 SearchFragmentBinding binding = SearchFragmentBinding.bind(real.getItem(VIEW));
-                                binding.setHandler(real.getItem(HANDLER));
-                                binding.setSearchHandler(real.<SearchHandler>getItem(HANDLER));
+                                SearchHandler handler = real.getItem(HANDLER);
+                                binding.setHandler(handler);
+                                binding.setSearchHandler(handler);
 
                                 RendererAdapter adapter = real.getItem(RESULT_ADAPTER);
                                 RecyclerView.LayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
                                 adapter.setLayoutManager(layoutManager);
                                 binding.shopRecyclerview.setAdapter(adapter);
                                 binding.shopRecyclerview.setLayoutManager(layoutManager);
+
+                                binding.swipeRefreshLayout.setOnRefreshListener(() -> store.dispatchWithDepends(
+                                        effect(depends(HANDLER), (r, s) -> r.<SearchHandler>getItem(HANDLER).refreshData())));
+
+                                binding.searchFrameLayout.searchEdittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                                    @Override
+                                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                                        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                                            store.dispatchWithDepends(
+                                                    effect(depends(HANDLER), (r, s) -> r.<SearchHandler>getItem(HANDLER).onClickSearch()));
+                                        }
+                                        return false;
+                                    }
+                                });
+                                binding.searchFrameLayout.searchEdittext.addTextChangedListener(new TextWatcher() {
+                                    @Override
+                                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                                    }
+
+                                    @Override
+                                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                                    }
+
+                                    @Override
+                                    public void afterTextChanged(Editable editable) {
+                                        if (TextUtils.isEmpty(editable)) {
+                                            store.dispatchWithDepends(
+                                                    effect(depends(HANDLER), (r, s) -> r.<SearchHandler>getItem(HANDLER).onClickSearch()));
+
+                                        }
+                                    }
+                                });
 
                                 return binding;
                             })
@@ -115,7 +151,7 @@ public class SearchFragment extends BaseToolbarFragment{
                                     suppiler ->
                                             list(GoodsModel.class)
                                                     .item(dataBindingRepositoryPresenterOf(GoodsModel.class)
-                                                            .layout(R.layout.home_history_item)
+                                                            .layout(R.layout.recycler_shop)
                                                             .staticItemId(BR.model)
                                                             .itemId(BR.showBtn, m -> suppiler.get().getSelectedItem() == m.getBarCode())
                                                             .handler(BR.clickMain,
@@ -134,15 +170,21 @@ public class SearchFragment extends BaseToolbarFragment{
                                                             .forItem())
                                                     .forCollection(s -> {
                                                         Stream<GoodsModel> stream = Stream.of(s.getResult())
-                                                                .filter(m -> s.getKeyWord() == null || m.getName().contains(s.getKeyWord()));
+                                                                .filter(m -> m.getCount() > 0 && (s.getKeyWord() == null || m.getName().contains(s.getKeyWord())));
 
                                                         switch (s.getSort()) {
                                                             case SORT_NAME:
-                                                                return stream.sortBy(m -> m.getName()).toList();
+                                                                return stream.sorted(
+                                                                        ComparatorCompat.<GoodsModel, String>comparing(m -> m.getName()).reversed())
+                                                                        .toList();
                                                             case SORT_COUNT:
-                                                                return stream.sortBy(m -> m.getCount()).toList();
+                                                                return stream.sorted(
+                                                                        ComparatorCompat.<GoodsModel>comparingDouble(m -> m.getCount()).reversed())
+                                                                        .toList();
                                                             case SORT_PRICE:
-                                                                return stream.sortBy(m -> m.getSalePrice()).toList();
+                                                                return stream.sorted(
+                                                                        ComparatorCompat.<GoodsModel>comparingDouble(m -> m.getSalePrice()).reversed())
+                                                                        .toList();
                                                             case SORT_DEFAULT:
                                                             default:
                                                                 return stream.toList();
@@ -158,10 +200,15 @@ public class SearchFragment extends BaseToolbarFragment{
 
     {
         store.subscribe(depends(BINDER),
-                (state, real) -> real.<SearchFragmentBinding>getItem(BINDER).setModel(state.getSearchState()));
+                (state, real) -> {
+                    SearchFragmentBinding binding = real.getItem(BINDER);
+                    binding.setModel(state.getSearchState());
+                    if(!state.getSearchState().isLoading())
+                        binding.swipeRefreshLayout.setRefreshing(false);
+                });
         store.subscribe(depends(MENU),
                 (state, real) -> real.<MenuItem>getItem(MENU)
-                        .setEnabled(!state.getSearchState().isLoading() && state.getSearchState().getResult().isEmpty()));
+                        .setEnabled(!state.getSearchState().isLoading() && !state.getSearchState().getResult().isEmpty()));
         store.subscribe(depends(RESULT_ADAPTER),
                 (state, real) -> real.<RendererAdapter>getItem(RESULT_ADAPTER).update(state.getSearchState()));
     }
@@ -180,9 +227,15 @@ public class SearchFragment extends BaseToolbarFragment{
     }
 
     @Override
+    public int provideOptionMenuRes() {
+        return R.menu.search_result_fragment;
+    }
+
+    @Override
     protected void onOptionsMenuCreated(Menu menu) {
         MenuItem sortMenuItem = menu.findItem(R.id.menu_sort);
         store.ready(MENU, sortMenuItem);
+        store.forceRender();
     }
 
     @Override
@@ -219,30 +272,31 @@ public class SearchFragment extends BaseToolbarFragment{
                     if(oldState.getSearchState().isLoading())
                         return Single.just(-1);
 
-                    ViewGroup mainView = real.getItem(VIEW);
-                    Context context = real.getItem(CONTEXT);
-                    View view = LayoutInflater.from(context).inflate(R.layout.sort_option_layout, mainView, false);
-                    ListView list = (ListView) view.findViewById(R.id.list_view);
-                    list.setAdapter(new ArrayAdapter<>(context, R.layout.search_sort_menu_item,
-                            context.getResources().getStringArray(R.array.search_sort_items)));
-                    list.setItemChecked(Arrays.binarySearch(SORT_OPTIONS, oldState.getSearchState().getSort()), true);
+                    return Single.<Integer>create(emmit -> {
+                        ViewGroup mainView = real.getItem(VIEW);
+                        Context context = real.getItem(CONTEXT);
+                        View view = LayoutInflater.from(context).inflate(R.layout.sort_option_layout, mainView, false);
+                        ListView list = (ListView) view.findViewById(R.id.list_view);
+                        list.setAdapter(new ArrayAdapter<>(context, R.layout.search_sort_menu_item,
+                                context.getResources().getStringArray(R.array.search_sort_items)));
+                        list.setItemChecked(Arrays.binarySearch(SORT_OPTIONS, oldState.getSearchState().getSort()), true);
 
-                    PopupWindow window = new PopupWindow(view, MATCH_PARENT, MATCH_PARENT);
-                    window.setFocusable(true);
-                    window.setOutsideTouchable(true);
-                    window.setBackgroundDrawable(new ColorDrawable());
-                    window.showAtLocation(mainView, Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
+                        PopupWindow window = new PopupWindow(view, MATCH_PARENT, MATCH_PARENT);
+                        window.setFocusable(true);
+                        window.setOutsideTouchable(true);
+                        window.setBackgroundDrawable(new ColorDrawable());
+                        window.showAtLocation(mainView, Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
 
-                    return Single.create(emmit -> {
                         window.setOnDismissListener(() -> {
                             if(!emmit.isDisposed()) emmit.onSuccess(-1);
                         });
                         list.setOnItemClickListener((lv, v, p, i) -> {
-                            window.dismiss();
                             emmit.onSuccess(SORT_OPTIONS[p]);
+                            window.dismiss();
                         });
                         view.setOnClickListener(v -> window.dismiss());
-                    });
+                    })
+                            .subscribeOn(AndroidSchedulers.mainThread());
                 },
                 ((sort, oldState) -> sort == -1 ? oldState
                         : oldState.withSearchState(oldState.getSearchState().withSort(sort))));

@@ -107,7 +107,7 @@ data class Module<Key, T>(
     val notReadyDepends: Set<Key> = HashSet(depends),
     val provideKey: Key,
 
-    val initializer: (RealWorld<Key>) -> T,
+    val initializer: (RealWorld<Key>) -> T?,
     val finalizer: Effect1<T>,
 
     val isInit: Boolean = false,
@@ -120,7 +120,8 @@ data class Module<Key, T>(
         if (isInit)
             return this
 
-        return copy(isInit = true, context = initializer(dependContext))
+        val con = initializer(dependContext)
+        return if(con == null) this else copy(isInit = true, context = con)
     }
 
     fun destroy(): Module<Key, T> {
@@ -165,6 +166,9 @@ class ContextCollection<Key>(private var providerList: Map<Key, Module<Key, *>> 
             getDepends(contextMap, depends)
 
     @Synchronized fun ready(ready: Ready<Key, *>) {
+        if(contextMap.containsKey(ready.key))
+            return
+
         val readyMap: Map<Key, Any> = mapOf(ready.key to ready.context!!)
         var readyData: ReadyData<Key> = ReadyData(contextMap, readyMap, providerList)
         do {
@@ -293,7 +297,7 @@ class DependsStore<Key, State>(
 
     fun ready(ready: Ready<Key, *>) = realWorld.ready(ready)
 
-    fun ready(key: Key, value: Any) = ready(Ready(key, value))
+    fun ready(key: Key, value: Any?) = value?.apply { ready(Ready(key, value)) }
 
     fun destroy(key: Key) = realWorld.destroy(key)
 
@@ -307,19 +311,19 @@ class DependsStore<Key, State>(
 
         fun <T> withItem(key: Key,
                          depends: Array<out Key>,
-                         initializer: (RealWorld<Key>, DependsStore<Key, State>) -> T): Builder<Key, State> {
+                         initializer: (RealWorld<Key>, DependsStore<Key, State>) -> T?): Builder<Key, State> {
             return withItem<T>(key, initializer, emptyEffect1(), *depends)
         }
 
         fun <T> withItem(key: Key,
                          depends: Array<out Key>,
-                         initializer: (RealWorld<Key>, DependsStore<Key, State>) -> T,
+                         initializer: (RealWorld<Key>, DependsStore<Key, State>) -> T?,
                          finalizer: Effect1<T>): Builder<Key, State> {
             return withItem<T>(key, initializer, finalizer, *depends)
         }
 
         fun <T> withItem(key: Key,
-                         initializer: (RealWorld<Key>, DependsStore<Key, State>) -> T,
+                         initializer: (RealWorld<Key>, DependsStore<Key, State>) -> T?,
                          finalizer: Effect1<T>,
                          vararg depends: Key): Builder<Key, State> {
             providerList.put(key, Module(provideKey = key,

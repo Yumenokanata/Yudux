@@ -2,21 +2,15 @@ package indi.yume.demo.newapplication.ui.fragment.home;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.annimon.stream.Collectors;
-import com.annimon.stream.Stream;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
+import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.Collections;
-import java.util.List;
 
 import indi.yume.demo.newapplication.BR;
 import indi.yume.demo.newapplication.R;
@@ -36,7 +30,6 @@ import indi.yume.yudux.collection.BaseDependAction;
 import indi.yume.yudux.collection.DependsStore;
 import indi.yume.yudux.functions.Unit;
 import io.reactivex.Single;
-import kotlin.Pair;
 
 import static indi.yume.demo.databinding.DataBindingDsl.dataBindingRepositoryPresenterOf;
 import static indi.yume.demo.newapplication.ui.fragment.home.HomeFragment.HomeKey.*;
@@ -75,14 +68,14 @@ public class HomeFragment extends BaseToolbarFragment{
                                 adapter.setLayoutManager(lastLayoutManager);
                                 binding.lastPayListView.setAdapter(adapter);
                                 binding.lastPayListView.setLayoutManager(lastLayoutManager);
-                                binding.lastPayListView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL));
+                                binding.lastPayListView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(context).build());
 
                                 RendererAdapter newAdapter = real.getItem(NEW_ADAPTER);
                                 RecyclerView.LayoutManager newLayoutManager = new LinearLayoutManager(context);
                                 newAdapter.setLayoutManager(newLayoutManager);
                                 binding.newArrivalListView.setAdapter(newAdapter);
                                 binding.newArrivalListView.setLayoutManager(newLayoutManager);
-                                binding.newArrivalListView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL));
+                                binding.newArrivalListView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(context).build());
 
                                 return binding;
                             })

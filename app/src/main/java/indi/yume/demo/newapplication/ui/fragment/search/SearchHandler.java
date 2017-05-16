@@ -1,5 +1,7 @@
 package indi.yume.demo.newapplication.ui.fragment.search;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import indi.yume.demo.newapplication.component.shopsearch.Handler;
@@ -36,7 +38,12 @@ public class SearchHandler implements Handler {
         action(depends(PRESENTER),
                 (real, loadState) -> {
                     SearchPresenter presenter = real.getItem(PRESENTER);
-                    return presenter.getAllGoods();
+                    return presenter.getAllGoods()
+                            .map(l -> {
+                                ArrayList<GoodsModel> list = new ArrayList<>(l);
+                                Collections.reverse(list);
+                                return list;
+                            });
                 },
                 ((data, state) -> state.withSearchState(state.getSearchState().withLoading(false).withResult(data))));
 

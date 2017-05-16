@@ -3,6 +3,7 @@ package indi.yume.yudux
 import indi.yume.yudux.collection.DependActionImpl
 import indi.yume.yudux.collection.Ready
 import indi.yume.yudux.collection.RealWorld
+import indi.yume.yudux.functions.BiConsumer
 import io.reactivex.Single
 
 /**
@@ -22,6 +23,15 @@ object DSL {
                                   effect: (RealWorld<Key>, State) -> Single<Data>,
                                   reducer: (Data, State) -> State): DependActionImpl<Key, State, Data> =
             DependActionImpl(depends, effect, reducer)
+
+    @JvmStatic
+    fun <Key, State> effect(depends: Array<out Key>,
+                            effect: BiConsumer<RealWorld<Key>, State>): DependActionImpl<Key, State, indi.yume.yudux.functions.Unit> =
+            DependActionImpl(depends,
+                    { real, oldState ->
+                        effect.accept(real, oldState)
+                        Single.just(indi.yume.yudux.functions.Unit.unit())
+                    }, emptyReducer())
 
     @JvmStatic
     fun <Key, State, SubState, Data> action(depends: Array<out Key>,

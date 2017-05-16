@@ -41,7 +41,7 @@ public abstract class SlideMenuActivity extends BaseFragmentActivity implements 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
-        slideMenuView.setOnClickListener(view -> drawerLayout.closeDrawers());
+        slideMenuView.setListener(view -> drawerLayout.closeDrawers());
         switchToStackByTag(HOME.getTag());
     }
 
