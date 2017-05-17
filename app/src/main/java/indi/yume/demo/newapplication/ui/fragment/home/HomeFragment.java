@@ -14,6 +14,7 @@ import java.util.Collections;
 
 import indi.yume.demo.newapplication.BR;
 import indi.yume.demo.newapplication.R;
+import indi.yume.demo.newapplication.component.keep.Actions;
 import indi.yume.demo.newapplication.databinding.HomeFragmentBinding;
 import indi.yume.demo.newapplication.functions.Receiver;
 import indi.yume.demo.newapplication.model.api.GoodsModel;
@@ -113,6 +114,7 @@ public class HomeFragment extends BaseToolbarFragment{
                                                                     })
                                                             .handler(BR.clickKeep,
                                                                     (Receiver<GoodsModel>) (model) -> {
+                                                                        Actions.toggleKeep(model);
                                                                     })
                                                             .forItem())
                                                     .forCollection(s -> s.getLastPay() == null ?
@@ -138,6 +140,7 @@ public class HomeFragment extends BaseToolbarFragment{
                                                                     })
                                                             .handler(BR.clickKeep,
                                                                     (Receiver<GoodsModel>) (model) -> {
+                                                                        Actions.toggleKeep(model);
                                                                     })
                                                             .forItem())
                                                     .forCollection(s -> s.getNewArrival() == null ?

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    tools:context="indi.yume.demo.newapplication.ui.fragment.keep.KeepFragment">
+    <data>
+        <variable
+            name="model"
+            type="indi.yume.demo.newapplication.ui.fragment.keep.KeepState"/>
+        <variable
+            name="handler"
+            type="indi.yume.demo.newapplication.ui.fragment.keep.KeepHandler"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_wh"
+        android:orientation="vertical">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <indi.yume.demo.newapplication.widget.CustomToolbar
+                style="@style/ToolbarStyle"
+                android:id="@+id/toolbar"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:ct_navigationType="menu"
+                app:ct_title="@string/title_activity_keep">
+
+                <TextView
+                    android:id="@+id/text_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_wh"
+                    android:textSize="16sp"
+                    android:text='@{String.format("（%d件）", model.keepCount)}'
+                    tools:text="（10件）" />
+
+            </indi.yume.demo.newapplication.widget.CustomToolbar>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/keep_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    </LinearLayout>
+
+</layout>

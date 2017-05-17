@@ -52,9 +52,9 @@ public class SlideMenuView extends FrameLayout {
             case R.id.search_item_view:
                 switchToStack(SlideMenuScreensTag.SEARCH);
                 break;
-//            case R.id.keep_item_view:
-//                switchToStack(SlideMenuScreensTag.BUY_HISTORY);
-//                break;
+            case R.id.keep_item_view:
+                switchToStack(SlideMenuScreensTag.KEEP);
+                break;
         }
 
         if (listener != null)
@@ -77,6 +77,10 @@ public class SlideMenuView extends FrameLayout {
             case SEARCH:
                 binding.searchItemView.setSelected(true);
                 activity.switchToStackByTag(SlideMenuScreensTag.SEARCH.getTag());
+                break;
+            case KEEP:
+                binding.keepItemView.setSelected(true);
+                activity.switchToStackByTag(SlideMenuScreensTag.KEEP.getTag());
                 break;
         }
     }

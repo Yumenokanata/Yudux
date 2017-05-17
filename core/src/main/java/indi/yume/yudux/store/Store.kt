@@ -61,6 +61,17 @@ interface StoreAction<S> {
     fun makeReduce(data: Any): Reducer<S>
 }
 
+class StoreActionDefault<Data, State>(val data: Data, val reducer: (Data, State) -> State) : StoreAction<State> {
+
+    override fun groupId(): String = GROUP_ID_DEFAULT
+
+    override fun effect(oldState: State): Single<Any> = Single.just(data)
+
+    override fun reduce(data: Any, oldState: State): State = reducer(data as Data, oldState)
+
+    override fun makeReduce(data: Any): Reducer<State> = { s -> reduce(data, s) }
+}
+
 class Store<State> {
 
     val eventSubject: Subject<StoreAction<State>> = PublishSubject.create()

@@ -28,6 +28,7 @@ import java.util.Arrays;
 
 import indi.yume.demo.newapplication.BR;
 import indi.yume.demo.newapplication.R;
+import indi.yume.demo.newapplication.component.keep.Actions;
 import indi.yume.demo.newapplication.databinding.SearchFragmentBinding;
 import indi.yume.demo.newapplication.functions.Receiver;
 import indi.yume.demo.newapplication.model.api.GoodsModel;
@@ -165,6 +166,7 @@ public class SearchFragment extends BaseToolbarFragment{
                                                                     })
                                                             .handler(BR.clickKeep,
                                                                     (Receiver<GoodsModel>) (model) -> {
+                                                                        Actions.toggleKeep(model);
                                                                     })
                                                             .forItem())
                                                     .forCollection(s -> {

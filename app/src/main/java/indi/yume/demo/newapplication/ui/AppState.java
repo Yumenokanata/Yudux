@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import indi.yume.demo.newapplication.model.api.UserModel;
 import indi.yume.demo.newapplication.ui.activity.login.LoginState;
 import indi.yume.demo.newapplication.ui.fragment.home.HomeState;
+import indi.yume.demo.newapplication.ui.fragment.keep.KeepState;
 import indi.yume.demo.newapplication.ui.fragment.search.SearchState;
 import lombok.Data;
 import lombok.experimental.Wither;
@@ -24,8 +25,10 @@ public class AppState {
     private final HomeState homeState;
     @Wither
     private final SearchState searchState;
+    @Wither
+    private final KeepState keepState;
 
     public static AppState empty() {
-        return new AppState(null, new LoginState(), new HomeState(), new SearchState());
+        return new AppState(null, new LoginState(), new HomeState(), new SearchState(), new KeepState());
     }
 }

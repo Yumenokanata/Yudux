@@ -4,6 +4,10 @@ import indi.yume.yudux.collection.DependActionImpl
 import indi.yume.yudux.collection.Ready
 import indi.yume.yudux.collection.RealWorld
 import indi.yume.yudux.functions.BiConsumer
+import indi.yume.yudux.store.GROUP_ID_DEFAULT
+import indi.yume.yudux.store.Reducer
+import indi.yume.yudux.store.StoreAction
+import indi.yume.yudux.store.StoreActionDefault
 import io.reactivex.Single
 
 /**
@@ -46,6 +50,11 @@ object DSL {
                     { data, state ->
                         setter(state, reducer(data, selector(state)))
                     })
+
+    @JvmStatic
+    fun <State, Data> mainAction(data: Data,
+                                 reducer: (Data, State) -> State): StoreAction<State> =
+            StoreActionDefault<Data, State>(data, reducer)
 
     @JvmStatic
     fun <Data, State> emptyReducer(): (Data, State) -> State = { _, s -> s }

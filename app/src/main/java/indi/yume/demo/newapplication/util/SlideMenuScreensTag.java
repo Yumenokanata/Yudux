@@ -1,6 +1,7 @@
 package indi.yume.demo.newapplication.util;
 
 import indi.yume.demo.newapplication.ui.fragment.home.HomeFragment;
+import indi.yume.demo.newapplication.ui.fragment.keep.KeepFragment;
 import indi.yume.demo.newapplication.ui.fragment.search.SearchFragment;
 import indi.yume.tools.fragmentmanager.BaseManagerFragment;
 import lombok.AllArgsConstructor;
@@ -20,11 +21,11 @@ public enum SlideMenuScreensTag {
     /**
      * 检索界面
      */
-    SEARCH("search",SearchFragment.class);
-//    /**
-//     * 收藏界面
-//     */
-//    KEEP("keep", C01_01_HistoryFragment.class),
+    SEARCH("search",SearchFragment.class),
+    /**
+     * 收藏界面
+     */
+    KEEP("keep", KeepFragment.class);
 //    /**
 //     * 我的小卖部界面
 //     */
