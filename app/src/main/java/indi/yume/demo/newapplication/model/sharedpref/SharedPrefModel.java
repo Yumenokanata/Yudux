@@ -3,6 +3,7 @@ package indi.yume.demo.newapplication.model.sharedpref;
 import java.util.List;
 
 import indi.yume.demo.newapplication.model.api.CartGoodsModel;
+import indi.yume.demo.newapplication.model.api.GoodsModel;
 import lombok.Data;
 
 /**
@@ -11,5 +12,8 @@ import lombok.Data;
 @Data
 public class SharedPrefModel {
     private String token = "";
+
     private List<CartGoodsModel> cartGoodsModelList;
+
+    private List<GoodsModel> keepList;
 }

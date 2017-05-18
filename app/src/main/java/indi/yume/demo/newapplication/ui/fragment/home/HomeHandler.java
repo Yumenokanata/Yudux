@@ -11,16 +11,21 @@ import java.util.List;
 import indi.yume.demo.newapplication.model.api.GoodsModel;
 import indi.yume.demo.newapplication.model.api.PayHistoryModel;
 import indi.yume.demo.newapplication.ui.AppState;
+import indi.yume.demo.newapplication.ui.AppStore;
 import indi.yume.demo.newapplication.ui.fragment.home.HomeFragment.HomeKey;
 import indi.yume.demo.newapplication.ui.presenter.HomePresenter;
 import indi.yume.demo.newapplication.util.DealErrorUtil;
 import indi.yume.demo.newapplication.util.DialogUtil;
 import indi.yume.yudux.collection.BaseDependAction;
-import indi.yume.yudux.collection.DependsStore;
+import indi.yume.yudux.collection.ContextCollection;
+import indi.yume.yudux.collection.LazyAction;
+import indi.yume.yudux.collection.RealWorld;
+import indi.yume.yudux.collection.SingleDepends;
 import io.reactivex.Single;
 import lombok.RequiredArgsConstructor;
 
 import static indi.yume.yudux.DSL.*;
+import static indi.yume.yudux.collection.DSL.*;
 import static indi.yume.demo.newapplication.ui.fragment.home.HomeFragment.HomeKey.*;
 
 /**
@@ -28,14 +33,14 @@ import static indi.yume.demo.newapplication.ui.fragment.home.HomeFragment.HomeKe
  */
 @RequiredArgsConstructor
 public class HomeHandler {
-    private final DependsStore<HomeKey, AppState> store;
+    private final ContextCollection<HomeKey> repo;
 
     public void initData() {
-        store.dispatchWithDepends(INIT_ACTION);
+        AppStore.mainStore.dispatch(create(repo, INIT_ACTION));
     }
 
-    private final BaseDependAction<HomeKey, AppState, HomeState> INIT_ACTION =
-            action(depends(CONTEXT, PRESENTER),
+    private static final LazyAction<RealWorld<HomeKey>, SingleDepends<HomeKey>, AppState, HomeState> INIT_ACTION =
+            action(lazy(CONTEXT, PRESENTER),
                     (real, oldState) -> {
                         Context context = real.getItem(CONTEXT);
                         HomePresenter presenter = real.getItem(PRESENTER);
@@ -49,7 +54,7 @@ public class HomeHandler {
                                 .compose(DialogUtil.composeNetProgressDialog(context))
                                 .compose(DealErrorUtil.dealErrorRetry(context));
                     },
-                    ((data, oldState) -> oldState.withHomeState(data)));
+                    (data, oldState) -> oldState.withHomeState(data));
 
     private static String getLastPayTime(PayHistoryModel model) {
         if(model.getHistory() == null || model.getHistory().isEmpty())

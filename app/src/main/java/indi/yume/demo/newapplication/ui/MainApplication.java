@@ -9,6 +9,9 @@ import indi.yume.yudux.store.Store;
 import lombok.Getter;
 import lombok.Setter;
 
+import static indi.yume.demo.newapplication.component.keep.Actions.refreshKeep;
+import static indi.yume.demo.newapplication.ui.AppStore.initMainRepo;
+
 /**
  * Created by yume on 16-4-16.
  */
@@ -18,8 +21,6 @@ public class MainApplication extends Application {
     @Setter
     @Getter
     private boolean myNotificationShown = false;
-    @Getter
-    private static final Store<AppState> mainStore = new Store<>(AppState.empty());
 
     public static MainApplication getInstance(Context context) {
         return (MainApplication) context.getApplicationContext();
@@ -29,6 +30,8 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
         inject();
+        initMainRepo(appComponent);
+        refreshKeep();
 
 //        ThrottleUtil.setThrottleTime(300);
     }

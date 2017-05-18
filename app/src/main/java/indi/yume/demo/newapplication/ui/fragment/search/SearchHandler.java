@@ -8,14 +8,19 @@ import indi.yume.demo.newapplication.component.shopsearch.Handler;
 import indi.yume.demo.newapplication.databinding.SearchFragmentBinding;
 import indi.yume.demo.newapplication.model.api.GoodsModel;
 import indi.yume.demo.newapplication.ui.AppState;
+import indi.yume.demo.newapplication.ui.fragment.search.SearchFragment.SearchKey;
 import indi.yume.demo.newapplication.ui.presenter.SearchPresenter;
-import indi.yume.yudux.collection.BaseDependAction;
-import indi.yume.yudux.collection.DependsStore;
+import indi.yume.yudux.collection.ContextCollection;
+import indi.yume.yudux.collection.LazyAction;
+import indi.yume.yudux.collection.RealWorld;
+import indi.yume.yudux.collection.SingleDepends;
 import io.reactivex.Single;
 import lombok.RequiredArgsConstructor;
 
+import static indi.yume.demo.newapplication.ui.AppStore.mainStore;
 import static indi.yume.demo.newapplication.ui.fragment.search.SearchFragment.SearchKey.BINDER;
 import static indi.yume.demo.newapplication.ui.fragment.search.SearchFragment.SearchKey.PRESENTER;
+import static indi.yume.yudux.collection.DSL.*;
 import static indi.yume.yudux.DSL.*;
 
 /**
@@ -23,19 +28,19 @@ import static indi.yume.yudux.DSL.*;
  */
 @RequiredArgsConstructor
 public class SearchHandler implements Handler {
-    private final DependsStore<SearchFragment.SearchKey, AppState> store;
+    private final ContextCollection<SearchKey> repo;
 
     public void refreshData() {
-        store.dispatchWithDepends(REFRESH_ACTION);
+        mainStore.dispatch(create(repo, REFRESH_ACTION));
     }
 
     @Override
     public void onClickSearch() {
-        store.dispatchWithDepends(SEARCH_ACTION);
+        mainStore.dispatch(create(repo, SEARCH_ACTION));
     }
 
-    private final BaseDependAction<SearchFragment.SearchKey, AppState, List<GoodsModel>> REFRESH_ACTION =
-        action(depends(PRESENTER),
+    private static final LazyAction<RealWorld<SearchKey>, SingleDepends<SearchKey>, AppState, List<GoodsModel>> REFRESH_ACTION =
+        action(lazy(PRESENTER),
                 (real, loadState) -> {
                     SearchPresenter presenter = real.getItem(PRESENTER);
                     return presenter.getAllGoods()
@@ -45,14 +50,14 @@ public class SearchHandler implements Handler {
                                 return list;
                             });
                 },
-                ((data, state) -> state.withSearchState(state.getSearchState().withLoading(false).withResult(data))));
+                (data, state) -> state.withSearchState(state.getSearchState().withLoading(false).withResult(data)));
 
-    private final BaseDependAction<SearchFragment.SearchKey, AppState, String> SEARCH_ACTION =
-            action(depends(BINDER),
+    private static final LazyAction<RealWorld<SearchKey>, SingleDepends<SearchKey>, AppState, String> SEARCH_ACTION =
+            action(lazy(BINDER),
                     (real, loadState) -> {
                         SearchFragmentBinding binding = real.getItem(BINDER);
                         return Single.just(binding.searchFrameLayout.searchEdittext.getText().toString());
                     },
-                    ((data, state) -> state.withSearchState(state.getSearchState().withKeyWord(data))));
+                    (data, state) -> state.withSearchState(state.getSearchState().withKeyWord(data)));
 
 }

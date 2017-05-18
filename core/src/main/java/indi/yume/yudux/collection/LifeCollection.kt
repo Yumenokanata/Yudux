@@ -1,10 +1,9 @@
 package indi.yume.yudux.collection
 
-import indi.yume.yudux.Log
 import indi.yume.yudux.functions.*
-import indi.yume.yudux.store.Action
-import indi.yume.yudux.store.Store
-import indi.yume.yudux.store.SubStore
+import indi.yume.yudux.functions.Result.Companion.left
+import indi.yume.yudux.functions.Result.Companion.right
+import indi.yume.yudux.store.*
 import io.reactivex.Single
 
 
@@ -15,103 +14,73 @@ val TAG = "Context"
 
 val VOID = Any()
 
-abstract class BaseDependAction<Key, State, Data> : Action<ContextCollection<Key>, State, Data> {
+abstract class BaseDependAction<R : MultiReal, State, Data>(val provider: ContextProvider<R>,
+                                                            groupId: String = GROUP_ID_DEFAULT)
+    : Action<State, Data>(groupId) {
 
-    constructor()
-
-    constructor(groupId: String) : super(groupId)
-
-    override fun effect(collection: ContextCollection<Key>, oldState: State): Single<Data> {
-        val result = collection.getDepends(depends())
+    override fun effect(oldState: State): Single<Data> {
+        val result = provider.get()
         return when(result) {
             is Right -> dependEffect(result.right, oldState)
-            is Fail -> Single.error(DependsNotReadyException(result.fail.joinToString(separator = ",")))
+            is Left -> {
+                dependsNotReady(result.left)
+                Single.error(DependsNotReadyException(result.left))
+            }
         }
     }
 
-    abstract fun depends(): Set<Key>
+    fun dependsNotReady(depends: List<String>) {}
 
-    fun dependsNotReady(depends: Set<Key>) {}
-
-    abstract fun dependEffect(realworld: RealWorld<Key>, oldState: State): Single<Data>
+    abstract fun dependEffect(realworld: R, oldState: State): Single<Data>
 }
 
-class DependActionImpl<Key, State, Data>: BaseDependAction<Key, State, Data> {
-    val depends: Set<Key>
-    val effect: (RealWorld<Key>, State) -> Single<Data>
+class DependActionImpl<R : MultiReal, State, Data>: BaseDependAction<R, State, Data> {
+    val effect: (R, State) -> Single<Data>
     val reducer: (Data, State) -> State
 
     constructor(
-            groupId: String,
-            depends: Array<out Key>,
-            effect: (RealWorld<Key>, State) -> Single<Data>,
-            reducer: (Data, State) -> State) : super(groupId) {
-        this.depends = depends.toSet()
+            groupId: String?,
+            depends: ContextProvider<R>,
+            effect: (R, State) -> Single<Data>,
+            reducer: (Data, State) -> State) : super(depends, groupId ?: GROUP_ID_DEFAULT) {
         this.effect = effect
         this.reducer = reducer
     }
 
     constructor(
-            depends: Array<out Key>,
-            effect: (RealWorld<Key>, State) -> Single<Data>,
-            reducer: (Data, State) -> State) : super() {
-        this.depends = depends.toSet()
+            depends: ContextProvider<R>,
+            effect: (R, State) -> Single<Data>,
+            reducer: (Data, State) -> State) : super(depends) {
         this.effect = effect
         this.reducer = reducer
     }
 
-    override fun depends(): Set<Key> = depends
-
-    override fun dependEffect(realworld: RealWorld<Key>, oldState: State): Single<Data> =
+    override fun dependEffect(realworld: R, oldState: State): Single<Data> =
             effect(realworld, oldState)
 
     override fun reduce(data: Data, oldState: State): State =
             reducer(data, oldState)
 }
 
-class RenderAction<Real, State> : Action<Real, State, Unit>() {
-
-    override fun effect(realworld: Real, oldState: State): Single<Unit> = Single.just(Unit)
-
-    override fun reduce(unit: Unit, oldState: State): State = oldState
-}
-
-class RealWorld<Key>(val context: Map<Key, Any>) {
-
-    fun <T> getItem(key: Key): T = context[key] as T
-
-    class Builder<K> internal constructor(var context: Map<K, Any> = emptyMap<K, Any>()) {
-
-        fun withItem(key: K, contextItem: Any): Builder<*> {
-            context += key to contextItem
-            return this
-        }
-
-        fun build(): RealWorld<K> = RealWorld(context)
-    }
-
-    companion object {
-        @JvmStatic
-        fun <K> empty(): RealWorld<K> = RealWorld(emptyMap())
-        @JvmStatic
-        fun <K> builder(): Builder<K> = Builder()
-        @JvmStatic
-        fun <K> newBuilder(copy: RealWorld<K>): Builder<K> = Builder<K>(copy.context)
-    }
-}
+data class LazyAction<R : MultiReal, D : Depends<R>, State, Data> (
+        val depends: D,
+        val effect: (R, State) -> Single<Data>,
+        val reducer: (Data, State) -> State,
+        val groupId: String? = null)
 
 data class Ready<Key, T>(val key: Key, val context: T)
 
 data class Module<Key, T>(
-    val depends: Set<Key>,
-    val notReadyDepends: Set<Key> = HashSet(depends),
-    val provideKey: Key,
+        val depends: Set<Key>,
+        val notReadyDepends: Set<Key> = HashSet(depends),
+        val extraDepends: ContextProvider<MultiReal>?,
+        val provideKey: Key,
 
-    val initializer: (RealWorld<Key>) -> T?,
-    val finalizer: Effect1<T>,
+        val initializer: (MultiReal) -> T?,
+        val finalizer: Effect1<T>,
 
-    val isInit: Boolean = false,
-    val context: T? = null
+        val isInit: Boolean = false,
+        val context: T? = null
 ) {
 
     fun depends(): Set<Key> = depends
@@ -120,7 +89,11 @@ data class Module<Key, T>(
         if (isInit)
             return this
 
-        val con = initializer(dependContext)
+        val extra = extraDepends?.get()
+        if(extra?.isLeft ?: false)
+            return this
+
+        val con = initializer(if(extra == null) dependContext else extra.right!!.append(dependContext))
         return if(con == null) this else copy(isInit = true, context = con)
     }
 
@@ -146,12 +119,17 @@ data class Module<Key, T>(
         return copy(notReadyDepends = notReadyDepends + key)
     }
 
-    val isReady: Result<Set<Key>, Set<Key>>
+    val isReady: Result<Set<Key>, List<String>>
         get() {
-            if (notReadyDepends.isEmpty())
-                return Result.right(depends)
+            if (notReadyDepends.isEmpty()) {
+                val extra = extraDepends?.get()
+                if(extra != null && extra is Left)
+                    return Result.left(extra.left)
 
-            return Result.fail(notReadyDepends)
+                return Result.right(depends)
+            }
+
+            return Result.left(notReadyDepends.map { it.toString() })
         }
 }
 
@@ -162,8 +140,19 @@ class ContextCollection<Key>(private var providerList: Map<Key, Module<Key, *>> 
         this.providerList = providerList
     }
 
-    @Synchronized fun getDepends(depends: Set<Key>): Result<RealWorld<Key>, Set<Key>> =
-            getDepends(contextMap, depends)
+    @Synchronized fun getDepends(depends: Set<Key>): Result<RealWorld<Key>, Set<Key>> {
+        var readyData: ReadyData<Key> = ReadyData(contextMap, emptyMap(), providerList)
+        do {
+            readyData = ready(readyData)
+        } while (!readyData.readyMap.isEmpty())
+
+        return getDepends(contextMap, depends)
+    }
+
+    @Synchronized fun check(depends: List<Any>): List<Any> =
+            depends.filter { (it as? Key)?.let { k -> !contextMap.containsKey(k) } ?: true }
+
+    fun ready(key: Key, context: Any?) = if(context != null) ready(Ready(key, context)) else Unit
 
     @Synchronized fun ready(ready: Ready<Key, *>) {
         if(contextMap.containsKey(ready.key))
@@ -203,9 +192,97 @@ class ContextCollection<Key>(private var providerList: Map<Key, Module<Key, *>> 
         for (key in newContextMap.keys)
             destroy(key)
     }
+    class Builder<Key> {
+        internal val collection: ContextCollection<Key> = ContextCollection()
+        internal val providerList: MutableMap<Key, Module<Key, *>> = HashMap()
+
+        fun <T> withItem(key: Key,
+                         depends: Array<out Key>,
+                         initializer: (RealWorld<Key>, ContextCollection<Key>) -> T?): Builder<Key> {
+            return withItem<T>(key, { real, coll -> initializer(real as RealWorld<Key>, coll) }, emptyEffect1(), null, *depends)
+        }
+
+        fun <T> withItem(key: Key,
+                         depends: Array<out Key>,
+                         initializer: (RealWorld<Key>, ContextCollection<Key>) -> T?,
+                         finalizer: Effect1<T>): Builder<Key> {
+            return withItem<T>(key, { real, coll -> initializer(real as RealWorld<Key>, coll) }, finalizer, null, *depends)
+        }
+
+        fun <K1, T> withItem(key: Key,
+                             depends: Array<out Key>,
+                             extraDepends: ContextProvider1<K1>,
+                             initializer: (BiReal<K1, Key>, ContextCollection<Key>) -> T?): Builder<Key> {
+            return withItem<T>(key, { real, coll -> initializer(real as BiReal<K1, Key>, coll) }, emptyEffect1(), extraDepends, *depends)
+        }
+
+        fun <K1, T> withItem(key: Key,
+                             depends: Array<out Key>,
+                             extraDepends: ContextProvider1<K1>,
+                             initializer: (BiReal<K1, Key>, ContextCollection<Key>) -> T?,
+                             finalizer: Effect1<T>): Builder<Key> {
+            return withItem<T>(key, { real, coll -> initializer(real as BiReal<K1, Key>, coll) }, finalizer, extraDepends, *depends)
+        }
+
+        fun <K1, K2, T> withItem(key: Key,
+                             depends: Array<out Key>,
+                             extraDepends: ContextProvider2<K1, K2>,
+                             initializer: (Real3<K1, K2, Key>, ContextCollection<Key>) -> T?): Builder<Key> {
+            return withItem<T>(key, { real, coll -> initializer(real as Real3<K1, K2, Key>, coll) }, emptyEffect1(), extraDepends, *depends)
+        }
+
+        fun <K1, K2, T> withItem(key: Key,
+                             depends: Array<out Key>,
+                             extraDepends: ContextProvider2<K1, K2>,
+                             initializer: (Real3<K1, K2, Key>, ContextCollection<Key>) -> T?,
+                             finalizer: Effect1<T>): Builder<Key> {
+            return withItem<T>(key, { real, coll -> initializer(real as Real3<K1, K2, Key>, coll) }, finalizer, extraDepends, *depends)
+        }
+
+        fun <T> withItem(key: Key,
+                         initializer: (MultiReal, ContextCollection<Key>) -> T?,
+                         finalizer: Effect1<T> = emptyEffect1(),
+                         extraDepends: ContextProvider<MultiReal>? = null,
+                         vararg depends: Key): Builder<Key> {
+            providerList.put(key, Module(provideKey = key,
+                    depends = depends.toSet(),
+                    extraDepends = extraDepends,
+                    initializer = { realWorld -> initializer(realWorld, collection) },
+                    finalizer = finalizer))
+            return this
+        }
+
+        fun <T> withItem(key: Key,
+                         initializer: BiSubscriber<RealWorld<Key>, ContextCollection<Key>>): Builder<Key> {
+            return withItem<T>(key, initializer, emptyEffect1())
+        }
+
+        fun <T> withItem(key: Key,
+                         initializer: BiSubscriber<RealWorld<Key>, ContextCollection<Key>>,
+                         finalizer: Effect1<T>): Builder<Key> {
+            return withItem<T>(key,
+                    { real, collection ->
+                        initializer.onStateChange(real as RealWorld<Key>, collection)
+                        real.getItem(key as Any)
+                    },
+                    finalizer)
+        }
+
+        fun build(): ContextCollection<Key> {
+            collection.providerList = providerList
+            return collection
+        }
+    }
 
     companion object {
-        fun <Key> getDepends(contextMap: Map<Key, Any>, depends: Set<Key>): Result<RealWorld<Key>, Set<Key>> {
+        @JvmStatic
+        fun <Key> builder(): Builder<Key> = Builder()
+
+        internal fun <T> emptyEffect1(): Effect1<T> = object : Effect1<T> {
+            override fun f(a: T) = Unit
+        }
+
+        internal fun <Key> getDepends(contextMap: Map<Key, Any>, depends: Set<Key>): Result<RealWorld<Key>, Set<Key>> {
             val builder = RealWorld.builder<Key>()
             var notReady: Set<Key> = emptySet()
             for (key in depends) {
@@ -220,7 +297,7 @@ class ContextCollection<Key>(private var providerList: Map<Key, Module<Key, *>> 
 
             if (notReady.isEmpty())
                 return Result.right(builder.build())
-            return Result.fail(notReady)
+            return Result.left(notReady)
         }
 
         private fun <Key> ready(readyData: ReadyData<Key>): ReadyData<Key> {
@@ -253,114 +330,58 @@ internal data class ReadyData<Key> (
         val providerList: Map<Key, Module<Key, *>>
 )
 
-class DependsStore<Key, State>(
-        mainStore: Store<State>,
-        providerList: Map<Key, Module<Key, *>> = emptyMap())
-    : SubStore<ContextCollection<Key>, State>(mainStore, ContextCollection(providerList)) {
 
-    @SafeVarargs
-    fun dispatchTransaction(vararg actions: BaseDependAction<Key, State, *>) =
-            dispatchTransaction(null, *actions)
 
-    fun dispatchWithDepends(action: BaseDependAction<Key, State, *>) {
-        super.dispatch(action)
-    }
-
-    fun forceRender() = dispatch(RenderAction<ContextCollection<Key>, State>())
-
-    fun subscribe(depends: Set<Key>, subscriber: BiSubscriber<State, RealWorld<Key>>): Subscription {
-        if (depends.isEmpty())
-            return mainStore.subscribe(object: Subscriber<State> {
-                override fun onStateChange(state: State) =
-                        subscriber.onStateChange(state, RealWorld.empty())
-            })
-
-        return mainStore.subscribe(object : Subscriber<State> {
-            override fun onStateChange(state: State) {
-                val result = realWorld.getDepends(depends)
-                when(result) {
-                    is Right -> subscriber.onStateChange(state, result.right)
-                    is Fail -> Log.d(TAG,
-                            "Can not subscribe, depends not ready: ${result.fail.joinToString(separator = ",")}")
-                }
-            }
-        })
-    }
-
-    fun subscribe(depends: Array<out Key>, subscriber: BiSubscriber<State, RealWorld<Key>>): Subscription {
-        return subscribe(subscriber, *depends)
-    }
-
-    fun subscribe(subscriber: BiSubscriber<State, RealWorld<Key>>, vararg depends: Key): Subscription {
-        return subscribe(depends.toSet(), subscriber)
-    }
-
-    fun ready(ready: Ready<Key, *>) = realWorld.ready(ready)
-
-    fun ready(key: Key, value: Any?) = value?.apply { ready(Ready(key, value)) }
-
-    fun destroy(key: Key) = realWorld.destroy(key)
-
-    fun destroyAll() = realWorld.destroyAll()
-
-    fun getState(): State = mainStore.getState()
-
-    class Builder<Key, State> internal constructor(mainStore: Store<State>) {
-        internal val store: DependsStore<Key, State> = DependsStore(mainStore)
-        internal val providerList: MutableMap<Key, Module<Key, *>> = HashMap()
-
-        fun <T> withItem(key: Key,
-                         depends: Array<out Key>,
-                         initializer: (RealWorld<Key>, DependsStore<Key, State>) -> T?): Builder<Key, State> {
-            return withItem<T>(key, initializer, emptyEffect1(), *depends)
-        }
-
-        fun <T> withItem(key: Key,
-                         depends: Array<out Key>,
-                         initializer: (RealWorld<Key>, DependsStore<Key, State>) -> T?,
-                         finalizer: Effect1<T>): Builder<Key, State> {
-            return withItem<T>(key, initializer, finalizer, *depends)
-        }
-
-        fun <T> withItem(key: Key,
-                         initializer: (RealWorld<Key>, DependsStore<Key, State>) -> T?,
-                         finalizer: Effect1<T>,
-                         vararg depends: Key): Builder<Key, State> {
-            providerList.put(key, Module(provideKey = key,
-                    depends = depends.toSet(),
-                    initializer = { realWorld -> initializer(realWorld, store) },
-                    finalizer = finalizer))
-            return this
-        }
-
-        fun <T> withItem(key: Key,
-                         initializer: BiSubscriber<RealWorld<Key>, DependsStore<Key, State>>): Builder<Key, State> {
-            return withItem<T>(key, initializer, emptyEffect1())
-        }
-
-        fun <T> withItem(key: Key,
-                         initializer: BiSubscriber<RealWorld<Key>, DependsStore<Key, State>>,
-                         finalizer: Effect1<T>): Builder<Key, State> {
-            return withItem<T>(key,
-                    { real, store ->
-                        initializer.onStateChange(real, store)
-                        real.getItem(key)
-                    },
-                    finalizer)
-        }
-
-        fun build(): DependsStore<Key, State> {
-            store.realWorld.setProviders(providerList)
-            return store
-        }
-    }
-
-    companion object {
-        @JvmStatic
-        fun <Key, State> builder(mainStore: Store<State>): Builder<Key, State> = Builder(mainStore)
-
-        internal fun <T> emptyEffect1(): Effect1<T> = object : Effect1<T> {
-            override fun f(a: T) = Unit
-        }
-    }
-}
+//class Depends1Store<Key, State>(
+//        mainStore: Store<State>,
+//        providerList: Map<Key, Module<Key, *>> = emptyMap())
+//    : SubStore<ContextCollection<Key>, State>(mainStore, ContextCollection(providerList)) {
+//
+//    @SafeVarargs
+//    fun dispatchTransaction(vararg actions: BaseDependAction<Key, State, *>) =
+//            dispatchTransaction(null, *actions)
+//
+//    fun dispatchWithDepends(action: BaseDependAction<Key, State, *>) {
+//        super.dispatch(action)
+//    }
+//
+//    fun forceRender() = dispatch(RenderAction<ContextCollection<Key>, State>())
+//
+//    fun subscribe(depends: Set<Key>, subscriber: BiSubscriber<State, RealWorld<Key>>): Subscription {
+//        if (depends.isEmpty())
+//            return mainStore.subscribe(object: Subscriber<State> {
+//                override fun onStateChange(state: State) =
+//                        subscriber.onStateChange(state, RealWorld.empty())
+//            })
+//
+//        return mainStore.subscribe(object : Subscriber<State> {
+//            override fun onStateChange(state: State) {
+//                val result = realWorld.getDepends(depends)
+//                when(result) {
+//                    is Right -> subscriber.onStateChange(state, result.right)
+//                    is Left -> Log.d(TAG,
+//                            "Can not subscribe, depends not ready: ${result.left.joinToString(separator = ",")}")
+//                }
+//            }
+//        })
+//    }
+//
+//    fun subscribe(depends: Array<out Key>, subscriber: BiSubscriber<State, RealWorld<Key>>): Subscription {
+//        return subscribe(subscriber, *depends)
+//    }
+//
+//    fun subscribe(subscriber: BiSubscriber<State, RealWorld<Key>>, vararg depends: Key): Subscription {
+//        return subscribe(depends.toSet(), subscriber)
+//    }
+//
+//    fun ready(ready: Ready<Key, *>) = realWorld.ready(ready)
+//
+//    fun ready(key: Key, value: Any?) = value?.apply { ready(Ready(key, value)) }
+//
+//    fun destroy(key: Key) = realWorld.destroy(key)
+//
+//    fun destroyAll() = realWorld.destroyAll()
+//
+//    fun getState(): State = mainStore.getState()
+//
+//}

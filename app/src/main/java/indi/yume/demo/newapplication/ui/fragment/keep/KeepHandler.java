@@ -4,7 +4,7 @@ import indi.yume.demo.newapplication.databinding.KeepFragmentBinding;
 import indi.yume.demo.newapplication.ui.AppState;
 
 import indi.yume.yudux.collection.BaseDependAction;
-import indi.yume.yudux.collection.DependsStore;
+import indi.yume.yudux.collection.ContextCollection;
 import lombok.RequiredArgsConstructor;
 
 import static indi.yume.demo.newapplication.ui.fragment.keep.KeepFragment.KeepKey.*;
@@ -15,6 +15,6 @@ import static indi.yume.yudux.DSL.*;
  */
 @RequiredArgsConstructor
 public class KeepHandler {
-    private final DependsStore<KeepFragment.KeepKey, AppState> store;
+    private final ContextCollection<KeepFragment.KeepKey> repo;
 
 }

@@ -13,11 +13,13 @@ import indi.yume.demo.newapplication.ui.component.LoginComponent;
 import indi.yume.demo.newapplication.ui.AppState;
 import indi.yume.demo.newapplication.ui.module.LoginModule;
 import indi.yume.demo.newapplication.ui.presenter.LoginPresenter;
-import indi.yume.yudux.collection.DependsStore;
+import indi.yume.yudux.collection.ContextCollection;
 import indi.yume.yudux.functions.Unit;
 
+import static indi.yume.demo.newapplication.ui.AppStore.mainStore;
 import static indi.yume.demo.newapplication.ui.activity.login.LoginActivity.LoginKey.*;
-import static indi.yume.yudux.DSL.depends;
+import static indi.yume.yudux.collection.DSL.*;
+import static indi.yume.yudux.DSL.*;
 
 /**
  * Created by DaggerGenerator on 2017/05/02.
@@ -32,8 +34,8 @@ public class LoginActivity extends BaseActivity {
         NONE   // use for init when all ready
     }
 
-    private final DependsStore<LoginKey, AppState> store =
-            DependsStore.<LoginKey, AppState>builder(MainApplication.getMainStore())
+    private final ContextCollection<LoginKey> repo =
+            ContextCollection.<LoginKey>builder()
                     .withItem(APP_COMPONENT,
                             depends(ACTIVITY),
                             (real, store) ->
@@ -48,7 +50,7 @@ public class LoginActivity extends BaseActivity {
                             })
                     .withItem(HANDLER,
                             depends(),
-                            (real, store) -> new LoginHandler(store))
+                            (real, collection) -> new LoginHandler(collection))
                     .withItem(PRESENTER,
                             depends(APP_COMPONENT),
                             (real, store) -> {
@@ -71,14 +73,14 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState){
-        store.ready(ACTIVITY, this);
+        repo.ready(ACTIVITY, this);
         super.onCreate(savedInstanceState);
-        store.forceRender();
+        forceRender(mainStore);
     }
 
     @Override
     protected void onDestroy() {
-        store.destroyAll();
+        repo.destroyAll();
         super.onDestroy();
     }
 

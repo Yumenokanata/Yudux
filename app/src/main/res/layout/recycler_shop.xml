@@ -9,6 +9,7 @@
             name="model"
             type="indi.yume.demo.newapplication.model.api.GoodsModel"/>
         <variable name="showBtn" type="java.lang.Boolean"/>
+        <variable name="hasKeep" type="java.lang.Boolean"/>
         <variable name="clickMain" type="indi.yume.demo.newapplication.functions.Receiver"/>
         <variable name="clickKeep" type="indi.yume.demo.newapplication.functions.Receiver"/>
         <variable name="clickBuy" type="indi.yume.demo.newapplication.functions.Receiver"/>
@@ -95,7 +96,8 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:background="@drawable/keep_btn_back"
-                    android:text="收藏"
+                    android:text='@{hasKeep ? "取消收藏" : "收藏"}'
+                    tools:text="取消收藏"
                     android:textColor="@color/color_bk"
                     android:textSize="15sp"
                     android:padding="5dp"

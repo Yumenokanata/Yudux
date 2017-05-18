@@ -9,18 +9,17 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 
-//import indi.yume.tools.fragmentmanager.OnShowMode;
 import indi.yume.demo.newapplication.R;
-import indi.yume.demo.newapplication.ui.MainApplication;
 import indi.yume.demo.newapplication.ui.activity.base.SlideMenuActivity;
-import indi.yume.demo.newapplication.ui.AppState;
 import indi.yume.demo.newapplication.widget.CustomToolbar;
 import indi.yume.tools.fragmentmanager.anno.OnHideMode;
 import indi.yume.tools.fragmentmanager.anno.OnShowMode;
-import indi.yume.yudux.collection.DependsStore;
+import indi.yume.yudux.collection.ContextCollection;
 
+import static indi.yume.demo.newapplication.ui.AppStore.mainStore;
 import static indi.yume.demo.newapplication.ui.fragment.base.BaseToolbarFragment.BaseToolKey.*;
 import static indi.yume.demo.newapplication.widget.CustomToolbar.TOOLBAR_MODE_MENU;
+import static indi.yume.yudux.collection.DSL.*;
 import static indi.yume.yudux.DSL.*;
 
 /**
@@ -34,8 +33,8 @@ public abstract class BaseToolbarFragment extends BaseFragment {
         VIEW
     }
 
-    protected final DependsStore<BaseToolKey, AppState> baseStore =
-            DependsStore.<BaseToolKey, AppState>builder(MainApplication.getMainStore())
+    protected final ContextCollection<BaseToolKey> baseRepo =
+            ContextCollection.<BaseToolKey>builder()
                     .withItem(TOOLBAR,
                             depends(ACTIVITY, VIEW),
                             (real, store) -> {
@@ -73,7 +72,7 @@ public abstract class BaseToolbarFragment extends BaseFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        baseStore.ready(VIEW, view);
+        baseRepo.ready(VIEW, view);
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -87,28 +86,28 @@ public abstract class BaseToolbarFragment extends BaseFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        baseStore.ready(ACTIVITY, getActivity());
+        baseRepo.ready(ACTIVITY, getActivity());
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        baseStore.destroy(ACTIVITY);
+        baseRepo.destroy(ACTIVITY);
     }
 
     protected void setToolbarMode(@CustomToolbar.ToolbarMode int mode) {
-        baseStore.dispatchWithDepends(effect(depends(TOOLBAR),
-                (real, oldState) -> real.<CustomToolbar>getItem(TOOLBAR).setMode(mode)));
+        mainStore.dispatch(create(baseRepo, effect(lazy(TOOLBAR),
+                (real, oldState) -> real.<CustomToolbar>getItem(TOOLBAR).setMode(mode))));
     }
 
     protected void setToolbarTitle(@StringRes int titleRes) {
-        baseStore.dispatchWithDepends(effect(depends(TOOLBAR),
-                (real, oldState) -> real.<CustomToolbar>getItem(TOOLBAR).setTitle(titleRes)));
+        mainStore.dispatch(create(baseRepo, effect(lazy(TOOLBAR),
+                (real, oldState) -> real.<CustomToolbar>getItem(TOOLBAR).setTitle(titleRes))));
     }
 
     protected void setToolbarTitle(String title) {
-        baseStore.dispatchWithDepends(effect(depends(TOOLBAR),
-                (real, oldState) -> real.<CustomToolbar>getItem(TOOLBAR).setTitle(title)));
+        mainStore.dispatch(create(baseRepo, effect(lazy(TOOLBAR),
+                (real, oldState) -> real.<CustomToolbar>getItem(TOOLBAR).setTitle(title))));
     }
 
     @Override
@@ -125,14 +124,14 @@ public abstract class BaseToolbarFragment extends BaseFragment {
     @Override
     public void onHide(OnHideMode mode) {
         super.onHide(mode);
-        baseStore.destroy(TOOLBAR);
-        baseStore.destroy(VIEW);
+        baseRepo.destroy(TOOLBAR);
+        baseRepo.destroy(VIEW);
     }
 
     @Override
     public void onShow(OnShowMode mode) {
         super.onShow(mode);
 
-        baseStore.ready(VIEW, getView());
+        baseRepo.ready(VIEW, getView());
     }
 }

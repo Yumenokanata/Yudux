@@ -13,11 +13,16 @@ import indi.yume.demo.newapplication.ui.presenter.LoginPresenter;
 import indi.yume.demo.newapplication.util.DealErrorUtil;
 import indi.yume.demo.newapplication.util.DialogUtil;
 import indi.yume.yudux.collection.BaseDependAction;
-import indi.yume.yudux.collection.DependsStore;
+import indi.yume.yudux.collection.ContextCollection;
+import indi.yume.yudux.collection.LazyAction;
+import indi.yume.yudux.collection.RealWorld;
+import indi.yume.yudux.collection.SingleDepends;
 import io.reactivex.Single;
 import lombok.RequiredArgsConstructor;
 
+import static indi.yume.demo.newapplication.ui.AppStore.mainStore;
 import static indi.yume.demo.newapplication.ui.activity.login.LoginActivity.LoginKey.*;
+import static indi.yume.yudux.collection.DSL.*;
 import static indi.yume.yudux.DSL.*;
 
 /**
@@ -25,18 +30,18 @@ import static indi.yume.yudux.DSL.*;
  */
 @RequiredArgsConstructor
 public class LoginHandler {
-    private final DependsStore<LoginKey, AppState> store;
+    private final ContextCollection<LoginKey> repo;
 
     public void initViewData() {
-        store.dispatchWithDepends(INIT_ACTION);
+        mainStore.dispatch(create(repo, INIT_ACTION));
     }
 
     public void clickLogin(View view) {
-        store.dispatchWithDepends(LOGIN_ACTION);
+        mainStore.dispatch(create(repo, LOGIN_ACTION));
     }
 
-    public final BaseDependAction<LoginKey, AppState, UserModel> INIT_ACTION =
-            action(depends(PRESENTER, ACTIVITY),
+    public static final LazyAction<RealWorld<LoginKey>, SingleDepends<LoginKey>, AppState, UserModel> INIT_ACTION =
+            action(lazy(PRESENTER, ACTIVITY),
                     (real, state) -> {
                         AppCompatActivity activity = real.getItem(ACTIVITY);
                         LoginPresenter presenter = real.getItem(PRESENTER);
@@ -54,8 +59,8 @@ public class LoginHandler {
                     },
                     (user, oldState) -> oldState.withUserModel(user));
 
-    public final BaseDependAction<LoginKey, AppState, UserModel> LOGIN_ACTION =
-            action(depends(PRESENTER, BINDER, ACTIVITY),
+    public static final LazyAction<RealWorld<LoginKey>, SingleDepends<LoginKey>, AppState, UserModel> LOGIN_ACTION =
+            action(lazy(PRESENTER, BINDER, ACTIVITY),
                     (real, state) -> {
                         AppCompatActivity activity = real.getItem(ACTIVITY);
                         LoginPresenter presenter = real.getItem(PRESENTER);
@@ -70,7 +75,7 @@ public class LoginHandler {
                                     onLoginOver(activity);
                                 });
                     },
-                    emptyReducer());
+                    (user, oldState) -> oldState.withUserModel(user));
 
     private static void onLoginOver(AppCompatActivity activity) {
         activity.startActivity(new Intent(activity, MainBaseActivity.class));

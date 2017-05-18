@@ -4,10 +4,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.annimon.stream.Stream;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.Collections;
@@ -28,12 +30,15 @@ import indi.yume.demo.newapplication.ui.module.KeepModule;
 import indi.yume.demo.newapplication.ui.presenter.KeepPresenter;
 import indi.yume.tools.dsladapter2.RendererAdapter;
 import indi.yume.yudux.collection.BaseDependAction;
-import indi.yume.yudux.collection.DependsStore;
+import indi.yume.yudux.collection.ContextCollection;
+import indi.yume.yudux.store.Action;
 import io.reactivex.Single;
 
 import static indi.yume.demo.databinding.DataBindingDsl.*;
+import static indi.yume.demo.newapplication.ui.AppStore.mainStore;
 import static indi.yume.demo.newapplication.ui.fragment.keep.KeepFragment.KeepKey.*;
 import static indi.yume.tools.dsladapter2.renderer.RenderDsl.*;
+import static indi.yume.yudux.collection.DSL.*;
 import static indi.yume.yudux.DSL.*;
 
 /**
@@ -49,8 +54,8 @@ public class KeepFragment extends BaseToolbarFragment {
         ADAPTER
     }
 
-    private final DependsStore<KeepKey, AppState> store =
-            DependsStore.<KeepKey, AppState>builder(MainApplication.getMainStore())
+    private final ContextCollection<KeepKey> repo =
+            ContextCollection.<KeepKey>builder()
                     .withItem(HANDLER,
                             depends(),
                             (real, store) -> new KeepHandler(store))
@@ -85,19 +90,21 @@ public class KeepFragment extends BaseToolbarFragment {
                             })
                     .withItem(ADAPTER,
                             depends(),
-                            (real, store) -> new RendererAdapter<>(store.getState().getKeepState(),
+                            (real, collection) -> new RendererAdapter<>(mainStore.getState().getKeepState(),
                                     suppiler ->
                                             list(GoodsModel.class)
                                                     .item(dataBindingRepositoryPresenterOf(GoodsModel.class)
                                                             .layout(R.layout.home_history_item)
                                                             .staticItemId(BR.model)
+                                                            .itemId(BR.hasKeep, m -> Stream.of(mainStore.getState().getKeepState().getKeepList())
+                                                                    .anyMatch(g -> TextUtils.equals(g.getBarCode(), m.getBarCode())))
                                                             .itemId(BR.showBtn, m -> suppiler.get().getSelectedItem() == m.getBarCode())
                                                             .handler(BR.clickMain,
                                                                     (Receiver<GoodsModel>) (model) -> {
                                                                         if (suppiler.get().getSelectedItem() == model.getBarCode())
-                                                                            store.dispatchWithDepends(selectItem(""));
+                                                                            mainStore.dispatch(selectItem(""));
                                                                         else
-                                                                            store.dispatchWithDepends(selectItem(model.getBarCode()));
+                                                                            mainStore.dispatch(selectItem(model.getBarCode()));
                                                                     })
                                                             .handler(BR.clickBuy,
                                                                     (Receiver<GoodsModel>) (model) -> {
@@ -105,6 +112,7 @@ public class KeepFragment extends BaseToolbarFragment {
                                                             .handler(BR.clickKeep,
                                                                     (Receiver<GoodsModel>) (model) -> {
                                                                         Actions.toggleKeep(model);
+                                                                        mainStore.dispatch(selectItem(""));
                                                                     })
                                                             .forItem())
                                                     .forCollection(s -> s.getKeepList() == null ?
@@ -112,34 +120,42 @@ public class KeepFragment extends BaseToolbarFragment {
                     .build();
 
     {
-        store.subscribe(depends(BINDER),
-                (state, real) -> real.<KeepFragmentBinding>getItem(BINDER).setModel(state.getKeepState()));
-        store.subscribe(depends(ADAPTER),
+        subscribeUntilChanged(
+                mainStore,
+                extra(repo, depends(BINDER)),
+                s -> s.getKeepState(),
+                (state, real) -> {
+                    System.out.println(getClass().getSimpleName() + "| Render Keep: " + state);
+                    real.<KeepFragmentBinding>getItem(BINDER).setModel(state);
+                });
+        subscribe(mainStore,
+                extra(repo, depends(ADAPTER)),
                 (state, real) -> real.<RendererAdapter>getItem(ADAPTER).update(state.getKeepState()));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.keep_fragment, container, false);
-        store.ready(VIEW, view);
+        repo.ready(VIEW, view);
+        forceRender(mainStore);
         return view;
     }
 
     @Override
     public void onAttach(Context context) {
-        store.ready(CONTEXT, context);
+        repo.ready(CONTEXT, context);
         super.onAttach(context);
     }
 
     @Override
     public void onDetach() {
-        store.destroy(CONTEXT);
+        repo.destroy(CONTEXT);
         super.onDetach();
     }
 
     @Override
     public void onDestroy() {
-        store.destroyAll();
+        repo.destroyAll();
         super.onDestroy();
     }
 
@@ -148,9 +164,8 @@ public class KeepFragment extends BaseToolbarFragment {
 
     }
 
-    private final BaseDependAction<KeepKey, AppState, String> selectItem(String barCode) {
-        return action(depends(),
-                (real, oldState) -> Single.just(barCode),
+    private final Action<AppState, String> selectItem(String barCode) {
+        return action(oldState -> Single.just(barCode),
                 ((selected, oldState) -> oldState.withKeepState(oldState.getKeepState().withSelectedItem(selected))));
     }
 }

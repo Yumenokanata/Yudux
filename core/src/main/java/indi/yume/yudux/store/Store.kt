@@ -2,10 +2,13 @@ package indi.yume.yudux.store
 
 import android.os.Handler
 import android.os.Looper
+import indi.yume.yudux.DSL.emptyEffect
+import indi.yume.yudux.DSL.emptyReducer
 import indi.yume.yudux.Log
 import indi.yume.yudux.functions.Subscriber
 import indi.yume.yudux.functions.Subscription
 import io.reactivex.BackpressureStrategy
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.internal.schedulers.NewThreadScheduler
 import io.reactivex.subjects.PublishSubject
@@ -36,16 +39,16 @@ class TransactionAction<State> : StoreAction<State> {
         return groupId
     }
 
-    override fun effect(oldState: State): Single<Any> {
+    override fun anyEffect(oldState: State): Single<Any> {
         throw UnsupportedOperationException("TransactionAction can not be real effect")
     }
 
-    override fun reduce(o: Any, oldState: State): State {
+    override fun anyReduce(o: Any, oldState: State): State {
         throw UnsupportedOperationException("TransactionAction can not be real reduce")
     }
 
     override fun makeReduce(data: Any): Reducer<State> {
-        return { s -> reduce(data, s) }
+        return { s -> anyReduce(data, s) }
     }
 }
 
@@ -54,22 +57,37 @@ typealias Reducer<S> = (S) -> S
 interface StoreAction<S> {
     fun groupId(): String
 
-    fun effect(oldState: S): Single<Any>
+    fun anyEffect(oldState: S): Single<Any>
 
-    fun reduce(data: Any, oldState: S): S
+    fun anyReduce(data: Any, oldState: S): S
 
     fun makeReduce(data: Any): Reducer<S>
 }
 
-class StoreActionDefault<Data, State>(val data: Data, val reducer: (Data, State) -> State) : StoreAction<State> {
+abstract class Action<State, Data>(val groupId: String = GROUP_ID_DEFAULT) : StoreAction<State> {
 
-    override fun groupId(): String = GROUP_ID_DEFAULT
+    override fun groupId(): String = groupId
 
-    override fun effect(oldState: State): Single<Any> = Single.just(data)
+    final override fun anyEffect(oldState: State): Single<Any> =
+            effect(oldState).map { it as Any }
 
-    override fun reduce(data: Any, oldState: State): State = reducer(data as Data, oldState)
+    final override fun anyReduce(data: Any, oldState: State): State =
+            reduce(data as Data, oldState)
 
-    override fun makeReduce(data: Any): Reducer<State> = { s -> reduce(data, s) }
+    final override fun makeReduce(data: Any): Reducer<State> =
+            { s -> anyReduce(data, s) }
+
+    abstract fun effect(oldState: State): Single<Data>
+
+    abstract fun reduce(data: Data, oldState: State): State
+}
+
+class StoreActionDefault<State, Data>(val effector: (State) -> Single<Data>,
+                                      val reducer: (Data, State) -> State,
+                                      groupId: String = GROUP_ID_DEFAULT) : Action<State, Data>(groupId){
+    override fun effect(oldState: State): Single<Data> = effector(oldState)
+
+    override fun reduce(data: Data, oldState: State): State = reducer(data, oldState)
 }
 
 class Store<State> {
@@ -91,9 +109,7 @@ class Store<State> {
                             .scan<StateData<State>>(StateData(getState(), getState()))
                             { stateData, action ->
                                 try {
-                                    var actionName = action::class.java.simpleName
-                                    if (action is StoreActionImpl<*, State, *>)
-                                        actionName = action.action::class.java.simpleName
+                                    val actionName = action::class.java.simpleName
                                     Log.d(TAG, "group: " + group.getKey() + " | start invoke action: " + actionName);
 
                                     handAction(stateData, action);
@@ -118,7 +134,7 @@ class Store<State> {
         }
 
         val data = action
-                .effect(stateData.newState)
+                .anyEffect(stateData.newState)
                 .blockingGet();
 
         setState(action.makeReduce(data));
@@ -151,6 +167,14 @@ class Store<State> {
     fun dispatch(action: StoreAction<State>) =
             eventSubject.onNext(action)
 
+    @SafeVarargs
+    fun dispatchTransaction(vararg actions: StoreAction<State>) =
+            dispatchTransaction(null, *actions)
+
+    @SafeVarargs
+    fun dispatchTransaction(groupId: String?, vararg actions: StoreAction<State>) =
+            dispatch(TransactionAction<State>(groupId, actions.toList()))
+
     fun subscribe(subscriber: Subscriber<State>): Subscription {
         subscribers += subscriber
         return object: Subscription {
@@ -159,6 +183,17 @@ class Store<State> {
             }
         }
     }
+
+    fun subscribe(): Observable<State> {
+        val subject = PublishSubject.create<State>()
+        val subscription = subscribe(Subscriber<State> { state -> subject.onNext(state) })
+        subject.doOnDispose { subscription.unsubscribe() }
+
+        return subject
+    }
+
+    fun <T> subscribeUntilChange(mapper: (State) -> T): Observable<T> =
+            subscribe().map(mapper).distinctUntilChanged()
 
     fun unsubscribe() = eventSubject.onComplete()
 

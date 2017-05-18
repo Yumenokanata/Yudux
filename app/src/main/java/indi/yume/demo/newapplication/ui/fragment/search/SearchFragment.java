@@ -42,19 +42,23 @@ import indi.yume.demo.newapplication.ui.module.SearchModule;
 import indi.yume.demo.newapplication.ui.presenter.SearchPresenter;
 import indi.yume.tools.dsladapter2.RendererAdapter;
 import indi.yume.yudux.collection.BaseDependAction;
-import indi.yume.yudux.collection.DependsStore;
+import indi.yume.yudux.collection.ContextCollection;
+import indi.yume.yudux.collection.LazyAction;
+import indi.yume.yudux.collection.RealWorld;
+import indi.yume.yudux.collection.SingleDepends;
 import indi.yume.yudux.functions.Unit;
+import indi.yume.yudux.store.Action;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static indi.yume.demo.databinding.DataBindingDsl.dataBindingRepositoryPresenterOf;
+import static indi.yume.demo.newapplication.ui.AppStore.mainStore;
 import static indi.yume.demo.newapplication.ui.fragment.search.SearchFragment.SearchKey.*;
 import static indi.yume.demo.newapplication.ui.fragment.search.SearchState.*;
 import static indi.yume.tools.dsladapter2.renderer.RenderDsl.*;
-import static indi.yume.yudux.DSL.action;
-import static indi.yume.yudux.DSL.depends;
-import static indi.yume.yudux.DSL.effect;
+import static indi.yume.yudux.DSL.*;
+import static indi.yume.yudux.collection.DSL.*;
 
 /**
  * Created by DaggerGenerator on 2017/05/15.
@@ -71,8 +75,8 @@ public class SearchFragment extends BaseToolbarFragment{
         INIT
     }
 
-    private final DependsStore<SearchKey, AppState> store =
-            DependsStore.<SearchKey, AppState>builder(MainApplication.getMainStore())
+    private final ContextCollection<SearchKey> repo =
+            ContextCollection.<SearchKey>builder()
                     .withItem(HANDLER,
                             depends(),
                             (real, store) -> new SearchHandler(store))
@@ -84,7 +88,7 @@ public class SearchFragment extends BaseToolbarFragment{
                             })
                     .withItem(BINDER,
                             depends(VIEW, HANDLER, RESULT_ADAPTER),
-                            (real, store) -> {
+                            (real, collection) -> {
                                 SearchFragmentBinding binding = SearchFragmentBinding.bind(real.getItem(VIEW));
                                 SearchHandler handler = real.getItem(HANDLER);
                                 binding.setHandler(handler);
@@ -96,15 +100,18 @@ public class SearchFragment extends BaseToolbarFragment{
                                 binding.shopRecyclerview.setAdapter(adapter);
                                 binding.shopRecyclerview.setLayoutManager(layoutManager);
 
-                                binding.swipeRefreshLayout.setOnRefreshListener(() -> store.dispatchWithDepends(
-                                        effect(depends(HANDLER), (r, s) -> r.<SearchHandler>getItem(HANDLER).refreshData())));
+                                binding.swipeRefreshLayout.setOnRefreshListener(() -> mainStore.dispatch(
+                                        create(collection,
+                                                effect(lazy(HANDLER),
+                                                        (r, s) -> r.<SearchHandler>getItem(HANDLER).refreshData()))));
 
                                 binding.searchFrameLayout.searchEdittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                                     @Override
                                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                                         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                                            store.dispatchWithDepends(
-                                                    effect(depends(HANDLER), (r, s) -> r.<SearchHandler>getItem(HANDLER).onClickSearch()));
+                                            mainStore.dispatch(create(collection,
+                                                    effect(lazy(HANDLER),
+                                                            (r, s) -> r.<SearchHandler>getItem(HANDLER).onClickSearch())));
                                         }
                                         return false;
                                     }
@@ -123,9 +130,9 @@ public class SearchFragment extends BaseToolbarFragment{
                                     @Override
                                     public void afterTextChanged(Editable editable) {
                                         if (TextUtils.isEmpty(editable)) {
-                                            store.dispatchWithDepends(
-                                                    effect(depends(HANDLER), (r, s) -> r.<SearchHandler>getItem(HANDLER).onClickSearch()));
-
+                                            mainStore.dispatch(create(collection,
+                                                    effect(lazy(HANDLER),
+                                                            (r, s) -> r.<SearchHandler>getItem(HANDLER).onClickSearch())));
                                         }
                                     }
                                 });
@@ -147,19 +154,21 @@ public class SearchFragment extends BaseToolbarFragment{
                             })
                     .withItem(RESULT_ADAPTER,
                             depends(),
-                            (real, store) -> new RendererAdapter<>(store.getState().getSearchState(),
+                            (real, store) -> new RendererAdapter<>(mainStore.getState().getSearchState(),
                                     suppiler ->
                                             list(GoodsModel.class)
                                                     .item(dataBindingRepositoryPresenterOf(GoodsModel.class)
                                                             .layout(R.layout.recycler_shop)
                                                             .staticItemId(BR.model)
+                                                            .itemId(BR.hasKeep, m -> Stream.of(mainStore.getState().getKeepState().getKeepList())
+                                                                    .anyMatch(g -> TextUtils.equals(g.getBarCode(), m.getBarCode())))
                                                             .itemId(BR.showBtn, m -> suppiler.get().getSelectedItem() == m.getBarCode())
                                                             .handler(BR.clickMain,
                                                                     (Receiver<GoodsModel>) (model) -> {
                                                                         if (suppiler.get().getSelectedItem() == model.getBarCode())
-                                                                            store.dispatchWithDepends(selectItem(""));
+                                                                            mainStore.dispatch(selectItem(""));
                                                                         else
-                                                                            store.dispatchWithDepends(selectItem(model.getBarCode()));
+                                                                            mainStore.dispatch(selectItem(model.getBarCode()));
                                                                     })
                                                             .handler(BR.clickBuy,
                                                                     (Receiver<GoodsModel>) (model) -> {
@@ -167,6 +176,7 @@ public class SearchFragment extends BaseToolbarFragment{
                                                             .handler(BR.clickKeep,
                                                                     (Receiver<GoodsModel>) (model) -> {
                                                                         Actions.toggleKeep(model);
+                                                                        mainStore.dispatch(selectItem(""));
                                                                     })
                                                             .forItem())
                                                     .forCollection(s -> {
@@ -200,30 +210,33 @@ public class SearchFragment extends BaseToolbarFragment{
                     .build();
 
     {
-        store.subscribe(depends(BINDER),
+        subscribe(mainStore,
+                extra(repo, depends(BINDER)),
                 (state, real) -> {
                     SearchFragmentBinding binding = real.getItem(BINDER);
                     binding.setModel(state.getSearchState());
                     if(!state.getSearchState().isLoading())
                         binding.swipeRefreshLayout.setRefreshing(false);
                 });
-        store.subscribe(depends(MENU),
+        subscribe(mainStore,
+                extra(repo, depends(MENU)),
                 (state, real) -> real.<MenuItem>getItem(MENU)
                         .setEnabled(!state.getSearchState().isLoading() && !state.getSearchState().getResult().isEmpty()));
-        store.subscribe(depends(RESULT_ADAPTER),
+        subscribe(mainStore,
+                extra(repo, depends(RESULT_ADAPTER)),
                 (state, real) -> real.<RendererAdapter>getItem(RESULT_ADAPTER).update(state.getSearchState()));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.search_fragment, container, false);
-        store.ready(VIEW, view);
+        repo.ready(VIEW, view);
         return view;
     }
 
     @Override
     public void onAttach(Context context) {
-        store.ready(CONTEXT, context);
+        repo.ready(CONTEXT, context);
         super.onAttach(context);
     }
 
@@ -235,15 +248,15 @@ public class SearchFragment extends BaseToolbarFragment{
     @Override
     protected void onOptionsMenuCreated(Menu menu) {
         MenuItem sortMenuItem = menu.findItem(R.id.menu_sort);
-        store.ready(MENU, sortMenuItem);
-        store.forceRender();
+        repo.ready(MENU, sortMenuItem);
+        forceRender(mainStore);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_sort:
-                store.dispatchWithDepends(CLICK_SORT_MENU);
+                mainStore.dispatch(create(repo, CLICK_SORT_MENU));
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -251,13 +264,13 @@ public class SearchFragment extends BaseToolbarFragment{
 
     @Override
     public void onDetach() {
-        store.destroy(CONTEXT);
+        repo.destroy(CONTEXT);
         super.onDetach();
     }
 
     @Override
     public void onDestroy() {
-        store.destroyAll();
+        repo.destroyAll();
         super.onDestroy();
     }
 
@@ -266,9 +279,9 @@ public class SearchFragment extends BaseToolbarFragment{
 
     }
 
-    private static final BaseDependAction<SearchKey, AppState, Integer> CLICK_SORT_MENU =
+    private static final LazyAction<RealWorld<SearchKey>, SingleDepends<SearchKey>, AppState, Integer> CLICK_SORT_MENU =
         action("menu",
-                depends(CONTEXT, MENU, VIEW),
+                lazy(CONTEXT, MENU, VIEW),
                 (real, oldState) -> {
                     if(oldState.getSearchState().isLoading())
                         return Single.just(-1);
@@ -299,12 +312,11 @@ public class SearchFragment extends BaseToolbarFragment{
                     })
                             .subscribeOn(AndroidSchedulers.mainThread());
                 },
-                ((sort, oldState) -> sort == -1 ? oldState
-                        : oldState.withSearchState(oldState.getSearchState().withSort(sort))));
+                (sort, oldState) -> sort == -1 ? oldState
+                        : oldState.withSearchState(oldState.getSearchState().withSort(sort)));
 
-    private static final BaseDependAction<SearchKey, AppState, String> selectItem(String barCode) {
-        return action(depends(),
-                (real, oldState) -> Single.just(barCode),
+    private final Action<AppState, String> selectItem(String barCode) {
+        return action(oldState -> Single.just(barCode),
                 ((selected, oldState) -> oldState.withSearchState(oldState.getSearchState().withSelectedItem(selected))));
     }
 }

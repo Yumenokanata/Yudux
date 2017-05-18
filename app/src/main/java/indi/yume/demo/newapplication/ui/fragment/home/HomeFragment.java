@@ -4,10 +4,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.annimon.stream.Stream;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.Collections;
@@ -19,6 +21,7 @@ import indi.yume.demo.newapplication.databinding.HomeFragmentBinding;
 import indi.yume.demo.newapplication.functions.Receiver;
 import indi.yume.demo.newapplication.model.api.GoodsModel;
 import indi.yume.demo.newapplication.ui.AppComponent;
+import indi.yume.demo.newapplication.ui.AppStore;
 import indi.yume.demo.newapplication.ui.MainApplication;
 import indi.yume.demo.newapplication.ui.component.DaggerHomeComponent;
 import indi.yume.demo.newapplication.ui.component.HomeComponent;
@@ -28,13 +31,17 @@ import indi.yume.demo.newapplication.ui.module.HomeModule;
 import indi.yume.demo.newapplication.ui.presenter.HomePresenter;
 import indi.yume.tools.dsladapter2.RendererAdapter;
 import indi.yume.yudux.collection.BaseDependAction;
-import indi.yume.yudux.collection.DependsStore;
+import indi.yume.yudux.collection.ContextCollection;
+import indi.yume.yudux.collection.RealWorld;
 import indi.yume.yudux.functions.Unit;
+import indi.yume.yudux.store.Action;
 import io.reactivex.Single;
 
 import static indi.yume.demo.databinding.DataBindingDsl.dataBindingRepositoryPresenterOf;
+import static indi.yume.demo.newapplication.ui.AppStore.mainStore;
 import static indi.yume.demo.newapplication.ui.fragment.home.HomeFragment.HomeKey.*;
 import static indi.yume.tools.dsladapter2.renderer.RenderDsl.*;
+import static indi.yume.yudux.collection.DSL.*;
 import static indi.yume.yudux.DSL.*;
 
 /**
@@ -52,8 +59,8 @@ public class HomeFragment extends BaseToolbarFragment{
         INIT
     }
 
-    private final DependsStore<HomeKey, AppState> store =
-            DependsStore.<HomeKey, AppState>builder(MainApplication.getMainStore())
+    private final ContextCollection<HomeKey> repo =
+            ContextCollection.<HomeKey>builder()
                     .withItem(HANDLER,
                             depends(),
                             (real, store) -> new HomeHandler(store))
@@ -95,19 +102,21 @@ public class HomeFragment extends BaseToolbarFragment{
                             })
                     .withItem(LAST_ADAPTER,
                             depends(),
-                            (real, store) -> new RendererAdapter<>(store.getState().getHomeState(),
+                            (real, collection) -> new RendererAdapter<>(mainStore.getState().getHomeState(),
                                     suppiler ->
                                             list(GoodsModel.class)
                                                     .item(dataBindingRepositoryPresenterOf(GoodsModel.class)
                                                             .layout(R.layout.home_history_item)
                                                             .staticItemId(BR.model)
+                                                            .itemId(BR.hasKeep, m -> Stream.of(mainStore.getState().getKeepState().getKeepList())
+                                                                    .anyMatch(g -> TextUtils.equals(g.getBarCode(), m.getBarCode())))
                                                             .itemId(BR.showBtn, m -> suppiler.get().getSelectedItemAtLast() == m.getBarCode())
                                                             .handler(BR.clickMain,
                                                                     (Receiver<GoodsModel>) (model) -> {
                                                                         if (suppiler.get().getSelectedItemAtLast() == model.getBarCode())
-                                                                            store.dispatchWithDepends(selectItemAtLast(""));
+                                                                            mainStore.dispatch(selectItemAtLast(""));
                                                                         else
-                                                                            store.dispatchWithDepends(selectItemAtLast(model.getBarCode()));
+                                                                            mainStore.dispatch(selectItemAtLast(model.getBarCode()));
                                                                     })
                                                             .handler(BR.clickBuy,
                                                                     (Receiver<GoodsModel>) (model) -> {
@@ -115,25 +124,28 @@ public class HomeFragment extends BaseToolbarFragment{
                                                             .handler(BR.clickKeep,
                                                                     (Receiver<GoodsModel>) (model) -> {
                                                                         Actions.toggleKeep(model);
+                                                                        mainStore.dispatch(selectItemAtLast(""));
                                                                     })
                                                             .forItem())
                                                     .forCollection(s -> s.getLastPay() == null ?
                                                             Collections.<GoodsModel>emptyList() : s.getLastPay())))
                     .withItem(NEW_ADAPTER,
                             depends(),
-                            (real, store) -> new RendererAdapter<>(store.getState().getHomeState(),
+                            (real, store) -> new RendererAdapter<>(mainStore.getState().getHomeState(),
                                     suppiler ->
                                             list(GoodsModel.class)
                                                     .item(dataBindingRepositoryPresenterOf(GoodsModel.class)
                                                             .layout(R.layout.home_history_item)
                                                             .staticItemId(BR.model)
+                                                            .itemId(BR.hasKeep, m -> Stream.of(mainStore.getState().getKeepState().getKeepList())
+                                                                    .anyMatch(g -> TextUtils.equals(g.getBarCode(), m.getBarCode())))
                                                             .itemId(BR.showBtn, m -> suppiler.get().getSelectedItemAtNew() == m.getBarCode())
                                                             .handler(BR.clickMain,
                                                                     (Receiver<GoodsModel>) (model) -> {
                                                                         if (suppiler.get().getSelectedItemAtNew() == model.getBarCode())
-                                                                            store.dispatchWithDepends(selectItemAtNew(""));
+                                                                            mainStore.dispatch(selectItemAtNew(""));
                                                                         else
-                                                                            store.dispatchWithDepends(selectItemAtNew(model.getBarCode()));
+                                                                            mainStore.dispatch(selectItemAtNew(model.getBarCode()));
                                                                     })
                                                             .handler(BR.clickBuy,
                                                                     (Receiver<GoodsModel>) (model) -> {
@@ -141,6 +153,7 @@ public class HomeFragment extends BaseToolbarFragment{
                                                             .handler(BR.clickKeep,
                                                                     (Receiver<GoodsModel>) (model) -> {
                                                                         Actions.toggleKeep(model);
+                                                                        mainStore.dispatch(selectItemAtNew(""));
                                                                     })
                                                             .forItem())
                                                     .forCollection(s -> s.getNewArrival() == null ?
@@ -155,36 +168,42 @@ public class HomeFragment extends BaseToolbarFragment{
                     .build();
 
     {
-        store.subscribe(depends(BINDER),
-                (state, real) -> real.<HomeFragmentBinding>getItem(BINDER).setState(state.getHomeState()));
-        store.subscribe(depends(LAST_ADAPTER),
-                (state, real) -> real.<RendererAdapter>getItem(LAST_ADAPTER).update(state.getHomeState()));
-        store.subscribe(depends(NEW_ADAPTER),
-                (state, real) -> real.<RendererAdapter>getItem(NEW_ADAPTER).update(state.getHomeState()));
+        subscribeUntilChanged(mainStore,
+                extra(repo, depends(BINDER)),
+                AppState::getHomeState,
+                (state, real) -> real.<HomeFragmentBinding>getItem(BINDER).setState(state));
+        subscribeUntilChanged(mainStore,
+                extra(repo, depends(LAST_ADAPTER)),
+                AppState::getHomeState,
+                (state, real) -> real.<RendererAdapter>getItem(LAST_ADAPTER).update(state));
+        subscribeUntilChanged(mainStore,
+                extra(repo, depends(NEW_ADAPTER)),
+                AppState::getHomeState,
+                (state, real) -> real.<RendererAdapter>getItem(NEW_ADAPTER).update(state));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.home_fragment, container, false);
-        store.ready(VIEW, view);
+        repo.ready(VIEW, view);
         return view;
     }
 
     @Override
     public void onAttach(Context context) {
-        store.ready(CONTEXT, context);
+        repo.ready(CONTEXT, context);
         super.onAttach(context);
     }
 
     @Override
     public void onDetach() {
-        store.destroy(CONTEXT);
+        repo.destroy(CONTEXT);
         super.onDetach();
     }
 
     @Override
     public void onDestroy() {
-        store.destroyAll();
+        repo.destroyAll();
         super.onDestroy();
     }
 
@@ -193,15 +212,13 @@ public class HomeFragment extends BaseToolbarFragment{
 
     }
 
-    private final BaseDependAction<HomeKey, AppState, String> selectItemAtLast(String barCode) {
-        return action(depends(),
-                (real, oldState) -> Single.just(barCode),
+    private final Action<AppState, String> selectItemAtLast(String barCode) {
+        return action(oldState -> Single.just(barCode),
                 ((selected, oldState) -> oldState.withHomeState(oldState.getHomeState().withSelectAtLast(selected))));
     }
 
-    private final BaseDependAction<HomeKey, AppState, String> selectItemAtNew(String barCode) {
-        return action(depends(),
-                (real, oldState) -> Single.just(barCode),
+    private final Action<AppState, String> selectItemAtNew(String barCode) {
+        return action(oldState -> Single.just(barCode),
                 ((selected, oldState) -> oldState.withHomeState(oldState.getHomeState().withSelectAtNew(selected))));
     }
 }
