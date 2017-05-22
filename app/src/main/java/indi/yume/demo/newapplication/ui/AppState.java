@@ -6,6 +6,7 @@ import indi.yume.demo.newapplication.model.api.UserModel;
 import indi.yume.demo.newapplication.ui.activity.login.LoginState;
 import indi.yume.demo.newapplication.ui.fragment.home.HomeState;
 import indi.yume.demo.newapplication.ui.fragment.keep.KeepState;
+import indi.yume.demo.newapplication.ui.fragment.mypage.MyPageState;
 import indi.yume.demo.newapplication.ui.fragment.search.SearchState;
 import lombok.Data;
 import lombok.experimental.Wither;
@@ -27,8 +28,11 @@ public class AppState {
     private final SearchState searchState;
     @Wither
     private final KeepState keepState;
+    @Wither
+    private final MyPageState myPageState;
 
     public static AppState empty() {
-        return new AppState(null, new LoginState(), new HomeState(), new SearchState(), new KeepState());
+        return new AppState(null, new LoginState(), new HomeState(), new SearchState(),
+                new KeepState(), new MyPageState());
     }
 }

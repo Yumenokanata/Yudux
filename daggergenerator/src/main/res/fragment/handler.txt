@@ -4,9 +4,10 @@ import ${basePackage}.databinding.${>name}FragmentBinding;
 import ${basePackage}.ui.AppState;
 
 import indi.yume.yudux.collection.BaseDependAction;
-import indi.yume.yudux.collection.DependsStore;
+import indi.yume.yudux.collection.ContextCollection;
 import lombok.RequiredArgsConstructor;
 
+import static ${basePackage}.ui.AppStore.mainStore;
 import static ${basePackage}${fragmentPackage}.${-name}.${name}Fragment.${name}Key.*;
 import static indi.yume.yudux.DSL.*;
 
@@ -15,6 +16,6 @@ import static indi.yume.yudux.DSL.*;
  */
 @RequiredArgsConstructor
 public class ${name}Handler {
-    private final DependsStore<${name}Fragment.${name}Key, AppState> store;
+    private final ContextCollection<${name}Fragment.${name}Key> repo;
 
 }

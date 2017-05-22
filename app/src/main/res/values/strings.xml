@@ -111,9 +111,14 @@
 
     <!-- History Start -->
     <string name="history_title">购买记录</string>
-    <string name="history_item_original_price">原价：%s 元</string>
-    <string name="history_item_price">单价：%s 元</string>
+    <string name="history_item_original_price">原价：%.2f 元</string>
+    <string name="history_item_price">单价：%.2f 元</string>
     <string name="history_order_price">总价：%s 元</string>
+
+    <string-array name="my_page_tab_title">
+        <item>历史订单</item>
+        <item>充值记录</item>
+    </string-array>
     <!-- History End -->
 
     <!-- Recharge Start -->

@@ -72,14 +72,21 @@
             android:id="@+id/search_item_view"
             bind:iconSrc="@{@drawable/ic_shopping_cart_black_24dp}"
             bind:itemBack="@{@drawable/slide_menu_back}"
-            bind:itemText="@{@string/slide_cart}"
+            bind:itemText="@{@string/slide_title_search}"
             bind:textColor="@{@color/slide_menu_text_color}"
             bind:handler="@{handler}"/>
         <include layout="@layout/slide_menu_item_layout"
             android:id="@+id/keep_item_view"
             bind:iconSrc="@{@drawable/ic_find_in_page_black_24dp}"
             bind:itemBack="@{@drawable/slide_menu_back}"
-            bind:itemText="@{@string/slide_buy_record}"
+            bind:itemText="@{@string/slide_title_keep}"
+            bind:textColor="@{@color/slide_menu_text_color}"
+            bind:handler="@{handler}"/>
+        <include layout="@layout/slide_menu_item_layout"
+            android:id="@+id/my_page_item_view"
+            bind:iconSrc="@{@drawable/ic_find_in_page_black_24dp}"
+            bind:itemBack="@{@drawable/slide_menu_back}"
+            bind:itemText="@{@string/slide_title_my_page}"
             bind:textColor="@{@color/slide_menu_text_color}"
             bind:handler="@{handler}"/>
 

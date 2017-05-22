@@ -62,6 +62,36 @@ object DSL {
     }
 
     @JvmStatic
+    fun <R : MultiReal, State, T> subscribeUntilChanged(mainStore: Store<State>,
+                                                        depends: ContextProvider<R>,
+                                                        compare: (State, State) -> Boolean,
+                                                        mapper: (State) -> T,
+                                                        subscriber: BiSubscriber<T, MultiReal>): Subscription {
+        return mainStore.subscribe(object : Subscriber<State> {
+            var lastState: State? = null
+            var hasValue = false
+
+            override fun onStateChange(state: State) {
+                val oldS = lastState
+                if(hasValue && oldS != null) {
+                    if(compare(oldS, state)) return
+                } else {
+                    lastState = state
+                    hasValue = true
+                }
+                val newData = mapper(state)
+
+                val result = depends.get()
+                when(result) {
+                    is Right -> subscriber.onStateChange(newData, result.right)
+                    is Left -> Log.d(TAG,
+                            "Can not subscribe, depends not ready: ${result.left.joinToString(separator = ",")}")
+                }
+            }
+        })
+    }
+
+    @JvmStatic
     fun <R : MultiReal, State> subscribe(mainStore: Store<State>,
                                          depends: ContextProvider<R>): Observable<Pair<State, MultiReal>> {
         return mainStore.subscribe()

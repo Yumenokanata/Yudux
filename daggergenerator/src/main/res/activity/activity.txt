@@ -13,9 +13,11 @@ import ${basePackage}${componentPackage}.${name}Component;
 import ${basePackage}.ui.AppState;
 import ${basePackage}${modulePackage}.${name}Module;
 import ${basePackage}${presenterPackage}.${name}Presenter;
-import indi.yume.yudux.collection.DependsStore;
+import indi.yume.yudux.collection.ContextCollection;
 
+import static ${basePackage}.ui.AppStore.mainStore;
 import static ${basePackage}${activityPackage}.${<name}.${name}Activity.${name}Key.*;
+import static indi.yume.yudux.collection.DSL.*;
 import static indi.yume.yudux.DSL.*;
 
 /**
@@ -29,21 +31,21 @@ public class ${name}Activity extends BaseActivity {
         HANDLER
     }
 
-    private final DependsStore<${name}Key, AppState> store =
-            DependsStore.<${name}Key, AppState>builder(MainApplication.getMainStore())
+    private final ContextCollection<${name}Key> repo =
+            ContextCollection.<${name}Key>builder()
                     .withItem(BINDER,
                             depends(ACTIVITY, HANDLER),
-                            (real, store) -> {
+                            (real, repo) -> {
                                 ${>name}ActivityBinding binding = DataBindingUtil.setContentView(real.getItem(ACTIVITY), R.layout.${_-name}_activity);
                                 binding.setHandler(real.getItem(HANDLER));
                                 return binding;
                             })
                     .withItem(HANDLER,
                             depends(),
-                            (real, store) -> new ${name}Handler(store))
+                            (real, repo) -> new ${name}Handler(repo))
                     .withItem(PRESENTER,
                             depends(ACTIVITY),
-                            (real, store) -> {
+                            (real, repo) -> {
                                 AppComponent appComponent = MainApplication.getInstance(real.getItem(ACTIVITY)).getAppComponent();
                                 ${name}Component ${<name}Component = Dagger${name}Component.builder()
                                         .appComponent(appComponent)
@@ -58,14 +60,14 @@ public class ${name}Activity extends BaseActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState){
-        store.ready(ACTIVITY, this);
+        repo.ready(ACTIVITY, this);
         super.onCreate(savedInstanceState);
-        store.forceRender();
+        repo.forceRender();
     }
 
     @Override
     protected void onDestroy() {
-        store.destroyAll();
+        repo.destroyAll();
         super.onDestroy();
     }
 

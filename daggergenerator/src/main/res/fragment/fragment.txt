@@ -16,9 +16,11 @@ import ${basePackage}.ui.AppState;
 import ${basePackage}${fragmentPackage}.base.BaseToolbarFragment;
 import ${basePackage}${modulePackage}.${name}Module;
 import ${basePackage}${presenterPackage}.${name}Presenter;
-import indi.yume.yudux.collection.DependsStore;
+import indi.yume.yudux.collection.ContextCollection;
 
+import static ${basePackage}.ui.AppStore.mainStore;
 import static ${basePackage}${fragmentPackage}.${-name}.${name}Fragment.${name}Key.*;
+import static indi.yume.yudux.collection.DSL.*;
 import static indi.yume.yudux.DSL.*;
 
 /**
@@ -33,14 +35,14 @@ public class ${name}Fragment extends BaseToolbarFragment {
         HANDLER
     }
 
-    private final DependsStore<${name}Key, AppState> store =
-            DependsStore.<${name}Key, AppState>builder(MainApplication.getMainStore())
+    private final ContextCollection<${name}Key> repo =
+            ContextCollection.<${name}Key>builder()
                     .withItem(HANDLER,
                             depends(),
-                            (real, store) -> new ${name}Handler(store))
+                            (real, repo) -> new ${name}Handler(repo))
                     .withItem(BINDER,
                             depends(VIEW, HANDLER),
-                            (real, store) -> {
+                            (real, repo) -> {
                                 ${name}FragmentBinding binding = ${name}FragmentBinding.bind(real.getItem(VIEW));
                                 binding.setHandler(real.getItem(HANDLER));
 
@@ -48,7 +50,7 @@ public class ${name}Fragment extends BaseToolbarFragment {
                             })
                     .withItem(PRESENTER,
                             depends(CONTEXT),
-                            (real, store) -> {
+                            (real, repo) -> {
                                 AppComponent appComponent = MainApplication.getInstance(real.getItem(CONTEXT)).getAppComponent();
                                 ${name}Component ${<name}Component = Dagger${name}Component.builder()
                                         .appComponent(appComponent)
@@ -62,32 +64,36 @@ public class ${name}Fragment extends BaseToolbarFragment {
                     .build();
 
     {
-        store.subscribe(depends(BINDER),
-                (state, real) -> real.<${name}FragmentBinding>getItem(BINDER).setModel(state.get${>name}State()));
+        subscribeUntilChanged(
+                mainStore,
+                extra(repo, depends(BINDER)),
+                s -> s.get${>name}State(),
+                (state, real) -> real.<${name}FragmentBinding>getItem(BINDER).setModel(state));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.${_-name}_fragment, container, false);
-        store.ready(VIEW, view);
+        repo.ready(VIEW, view);
+        forceRender(mainStore);
         return view;
     }
 
     @Override
     public void onAttach(Context context) {
-        store.ready(CONTEXT, context);
+        repo.ready(CONTEXT, context);
         super.onAttach(context);
     }
 
     @Override
     public void onDetach() {
-        store.destroy(CONTEXT);
+        repo.destroy(CONTEXT);
         super.onDetach();
     }
 
     @Override
     public void onDestroy() {
-        store.destroyAll();
+        repo.destroyAll();
         super.onDestroy();
     }
 

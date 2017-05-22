@@ -6,8 +6,11 @@ import ${basePackage}.ui.AppState;
 import indi.yume.yudux.collection.BaseDependAction;
 import indi.yume.yudux.collection.DependsStore;
 import lombok.RequiredArgsConstructor;
+import indi.yume.yudux.collection.ContextCollection;
 
+import static ${basePackage}.ui.AppStore.mainStore;
 import static ${basePackage}${activityPackage}.${-name}.${name}Activity.${name}Key.*;
+import static indi.yume.yudux.collection.DSL.*;
 import static indi.yume.yudux.DSL.*;
 
 /**
@@ -15,6 +18,6 @@ import static indi.yume.yudux.DSL.*;
  */
 @RequiredArgsConstructor
 public class ${name}Handler {
-    private final DependsStore<${name}Activity.${name}Key, AppState> store;
+    private final ContextCollection<${name}Activity.${name}Key> repo;
 
 }

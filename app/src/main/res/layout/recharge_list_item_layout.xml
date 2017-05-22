@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <import type="indi.yume.demo.newapplication.util.DateUtils"/>
+        <variable name="model" type="indi.yume.demo.newapplication.model.api.ChargeModel.ChargeEntry"/>
+    </data>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_attach_money_red_400_24dp" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="8dp">
+
+            <TextView
+                android:id="@+id/recharge_record_money_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:textSize="16sp"
+                android:text='@{String.format("%.2f", model.charge)}'
+                tools:text="20" />
+
+            <TextView
+                android:id="@+id/recharge_record_date_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="8dp"
+                android:textSize="16sp"
+                android:text="@{DateUtils.msToDate(model.time)}"
+                tools:text="2016年5月4日" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/color_gr5"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+    </LinearLayout>
+</layout>
