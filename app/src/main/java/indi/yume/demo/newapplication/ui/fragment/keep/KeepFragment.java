@@ -16,6 +16,7 @@ import java.util.Collections;
 
 import indi.yume.demo.newapplication.BR;
 import indi.yume.demo.newapplication.R;
+import indi.yume.demo.newapplication.component.cart.CartActions;
 import indi.yume.demo.newapplication.component.keep.Actions;
 import indi.yume.demo.newapplication.databinding.KeepFragmentBinding;
 import indi.yume.demo.newapplication.functions.Receiver;
@@ -108,6 +109,8 @@ public class KeepFragment extends BaseToolbarFragment {
                                                                     })
                                                             .handler(BR.clickBuy,
                                                                     (Receiver<GoodsModel>) (model) -> {
+                                                                        CartActions.toggle(model);
+                                                                        mainStore.dispatch(selectItem(""));
                                                                     })
                                                             .handler(BR.clickKeep,
                                                                     (Receiver<GoodsModel>) (model) -> {

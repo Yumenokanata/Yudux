@@ -60,6 +60,10 @@ public class RxUtil {
         return new SwitchTransform<>(subscribeOn, observeOn);
     }
 
+    public static void postUI(Runnable runnable) {
+        AndroidSchedulers.mainThread().createWorker().schedule(runnable);
+    }
+
     public static void clearCache(Context context) {
         TempPath.clear(context);
     }

@@ -94,9 +94,9 @@
     <string name="clear_cart">清空</string>
     <string name="select_all_cart">全选</string>
     <string name="cart_title">购物车</string>
-    <string name="cart_order_price">总价：%s 元</string>
-    <string name="cart_item_value">原价：%s 元</string>
-    <string name="cart_item_price">单价：%s 元</string>
+    <string name="cart_order_price">总价：%.2f 元</string>
+    <string name="cart_item_value">原价：%.2f 元</string>
+    <string name="cart_item_price">单价：%.2f 元</string>
 
     <string name="cart_dialog_tip">长按识别指纹确定购买</string>
     <string name="cart_dialog_title">结账</string>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <variable name="name" type="String"/>
+        <variable name="enough" type="Boolean"/>
+        <variable name="count" type="Integer"/>
+    </data>
+    
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/name_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:text="@{name}"
+        tools:text="法式小面包（奶香味）" />
+
+    <TextView
+        android:id="@+id/quantity_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:textColor="@{enough ? @color/black : @color/main_color}"
+        android:text='@{enough ? @string/cart_dialog_quantity(count) : @string/cart_dialog_outofstock}'
+        tools:text="x7" />
+</RelativeLayout>
+</layout>

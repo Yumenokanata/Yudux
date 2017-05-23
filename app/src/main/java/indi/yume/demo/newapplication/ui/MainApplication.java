@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.multidex.MultiDex;
 
 //import indi.yume.tools.fragmentmanager.ThrottleUtil;
+import indi.yume.demo.newapplication.component.cart.CartActions;
 import indi.yume.yudux.store.Store;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +33,7 @@ public class MainApplication extends Application {
         inject();
         initMainRepo(appComponent);
         refreshKeep();
+        CartActions.init();
 
 //        ThrottleUtil.setThrottleTime(300);
     }

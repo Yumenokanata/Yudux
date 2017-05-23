@@ -143,6 +143,8 @@ dependencies {
     compile 'com.yqritc:recyclerview-flexibledivider:1.4.0'
     compile 'com.github.lsjwzh.RecyclerViewPager:lib:v1.1.2@aar'
     compile 'com.github.lsjwzh.RecyclerViewPager:tablayoutsupport:v1.1.2@aar'
+    compile 'com.romainpiel.shimmer:library:1.4.0@aar'
+    compile 'com.wang.avi:library:1.0.5'
 
     debugCompile 'com.facebook.stetho:stetho:1.4.2'
     debugCompile 'com.facebook.stetho:stetho-okhttp3:1.4.2'

@@ -1,5 +1,6 @@
 package indi.yume.demo.newapplication.util;
 
+import indi.yume.demo.newapplication.ui.fragment.cart.CartFragment;
 import indi.yume.demo.newapplication.ui.fragment.home.HomeFragment;
 import indi.yume.demo.newapplication.ui.fragment.keep.KeepFragment;
 import indi.yume.demo.newapplication.ui.fragment.mypage.MyPageFragment;
@@ -30,11 +31,11 @@ public enum SlideMenuScreensTag {
     /**
      * 我的小卖部界面
      */
-    MY_PAGE("my_page", MyPageFragment.class);
-//    /**
-//     * 购物车界面
-//     */
-//    CART("cart", E01_01_UserInfoFragment.class),
+    MY_PAGE("my_page", MyPageFragment.class),
+    /**
+     * 购物车界面
+     */
+    CART("cart", CartFragment.class);
 //    /**
 //     * QR界面
 //     */

@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import indi.yume.demo.newapplication.model.api.UserModel;
 import indi.yume.demo.newapplication.ui.activity.login.LoginState;
+import indi.yume.demo.newapplication.ui.fragment.cart.CartState;
 import indi.yume.demo.newapplication.ui.fragment.home.HomeState;
 import indi.yume.demo.newapplication.ui.fragment.keep.KeepState;
 import indi.yume.demo.newapplication.ui.fragment.mypage.MyPageState;
@@ -30,9 +31,11 @@ public class AppState {
     private final KeepState keepState;
     @Wither
     private final MyPageState myPageState;
+    @Wither
+    private final CartState cartState;
 
     public static AppState empty() {
         return new AppState(null, new LoginState(), new HomeState(), new SearchState(),
-                new KeepState(), new MyPageState());
+                new KeepState(), new MyPageState(), new CartState());
     }
 }

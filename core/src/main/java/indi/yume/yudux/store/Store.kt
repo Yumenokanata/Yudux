@@ -54,6 +54,8 @@ class TransactionAction<State> : StoreAction<State> {
 
 typealias Reducer<S> = (S) -> S
 
+fun <S> Reducer<S>.bind(reducer: Reducer<S>): Reducer<S> = { reducer(this(it)) }
+
 interface StoreAction<S> {
     fun groupId(): String
 
@@ -96,7 +98,7 @@ class Store<State> {
 
     var subscribers: List<Subscriber<State>>  = emptyList()
 
-    var currentState: State
+    private var currentState: State
 
     val UIHandler: Handler by lazy { Handler(Looper.getMainLooper()) }
 
@@ -106,16 +108,18 @@ class Store<State> {
                 .groupBy { act -> act.groupId() }
                 .flatMap { group ->
                     group.observeOn(NewThreadScheduler())
-                            .scan<StateData<State>>(StateData(getState(), getState()))
-                            { stateData, action ->
+                            .scan<State>(getState())
+                            { oldState, action ->
+                                val state = getState()
                                 try {
                                     val actionName = action::class.java.simpleName
                                     Log.d(TAG, "group: " + group.getKey() + " | start invoke action: " + actionName);
 
-                                    handAction(stateData, action);
+                                    setState(handAction(state, action))
+                                    getState()
                                 } catch (e: Exception) {
-                                    Log.e(TAG, "Deal event error: ", e);
-                                    stateData;
+                                    Log.e(TAG, "Deal event error: ", e)
+                                    state
                                 }
                             }
                 }
@@ -124,22 +128,24 @@ class Store<State> {
                         { Log.d(TAG, "Loading Store event looper has dead.") })
     }
 
-    private fun handAction(stateData: StateData<State>, action: StoreAction<State>): StateData<State> {
+    private fun handAction(stateData: State, action: StoreAction<State>): Reducer<State> {
         if(action is TransactionAction) {
-            var stateDataTemp = stateData;
-            val list: List<StoreAction<State>>  = action.list;
-            for(aItem in list)
-                stateDataTemp = handAction(stateDataTemp, aItem);
-            return stateDataTemp;
+            var stateDataTemp = stateData
+            var reducer: Reducer<State> = { it }
+            val list: List<StoreAction<State>>  = action.list
+            for(aItem in list) {
+                val subReducer = handAction(stateDataTemp, aItem)
+                stateDataTemp = subReducer(stateDataTemp)
+                reducer = reducer.bind(subReducer)
+            }
+            return reducer
         }
 
         val data = action
-                .anyEffect(stateData.newState)
-                .blockingGet();
+                .anyEffect(stateData)
+                .blockingGet()
 
-        setState(action.makeReduce(data));
-
-        return StateData(stateData.newState, getState());
+        return action.makeReduce(data)
     }
 
     private fun setState(reducer: Reducer<State>) {

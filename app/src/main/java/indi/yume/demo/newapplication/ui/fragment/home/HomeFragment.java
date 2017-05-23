@@ -16,6 +16,7 @@ import java.util.Collections;
 
 import indi.yume.demo.newapplication.BR;
 import indi.yume.demo.newapplication.R;
+import indi.yume.demo.newapplication.component.cart.CartActions;
 import indi.yume.demo.newapplication.component.keep.Actions;
 import indi.yume.demo.newapplication.databinding.HomeFragmentBinding;
 import indi.yume.demo.newapplication.functions.Receiver;
@@ -120,6 +121,8 @@ public class HomeFragment extends BaseToolbarFragment{
                                                                     })
                                                             .handler(BR.clickBuy,
                                                                     (Receiver<GoodsModel>) (model) -> {
+                                                                        CartActions.toggle(model);
+                                                                        mainStore.dispatch(selectItemAtLast(""));
                                                                     })
                                                             .handler(BR.clickKeep,
                                                                     (Receiver<GoodsModel>) (model) -> {
@@ -149,6 +152,8 @@ public class HomeFragment extends BaseToolbarFragment{
                                                                     })
                                                             .handler(BR.clickBuy,
                                                                     (Receiver<GoodsModel>) (model) -> {
+                                                                        CartActions.toggle(model);
+                                                                        mainStore.dispatch(selectItemAtLast(""));
                                                                     })
                                                             .handler(BR.clickKeep,
                                                                     (Receiver<GoodsModel>) (model) -> {

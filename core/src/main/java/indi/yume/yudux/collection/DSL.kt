@@ -46,6 +46,7 @@ object DSL {
                 if(hasValue) {
                     val oldS = lastState
                     if(oldS == newS) return
+                    lastState = newS
                 } else {
                     lastState = newS
                     hasValue = true
@@ -75,6 +76,7 @@ object DSL {
                 val oldS = lastState
                 if(hasValue && oldS != null) {
                     if(compare(oldS, state)) return
+                    lastState = state
                 } else {
                     lastState = state
                     hasValue = true

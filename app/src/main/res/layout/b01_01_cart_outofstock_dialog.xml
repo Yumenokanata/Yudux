@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <import type="android.view.View"/>
+        <variable name="canPay" type="Boolean"/>
+        <variable name="payPrice" type="Float"/>
+        <variable name="originPrice" type="Float"/>
+        <variable name="reorderHandler" type="indi.yume.demo.newapplication.functions.Receiver"/>
+        <variable name="payHandler" type="android.view.View.OnLongClickListener"/>
+    </data>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="8dp"
+                android:text="@string/cart_dialog_title"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/divider_gr6" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/order_dialog_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:listitem="@layout/b01_01_cart_order_dialog_recyclerview_item"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/divider_gr6" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_shopping_cart_red_400_36dp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:gravity="end"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/order_value_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_gr5"
+                    android:textSize="16sp"
+                    app:deleteText="@{@string/cart_item_value(originPrice)}"
+                    tools:text="原价: 998 元" />
+
+                <TextView
+                    android:id="@+id/order_money_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:text="@{@string/cart_order_price(payPrice)}"
+                    tools:text="总价: 998 元" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:visibility="@{canPay ? View.VISIBLE : View.GONE}">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_fingerprint_red_400_48dp"
+                android:onLongClick="@{payHandler}"/>
+
+            <com.romainpiel.shimmer.ShimmerTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:text="@string/cart_dialog_tip" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/reorder_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="16dp"
+            android:text="重新下单"
+            android:textColor="@color/main_color"
+            android:visibility="@{canPay ? View.GONE : View.VISIBLE}"
+            android:onClick="@{(view) -> reorderHandler.accept(view)}"/>
+
+        <com.wang.avi.AVLoadingIndicatorView
+            android:id="@+id/loading_avloadingIndicatorView"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            android:visibility="gone"
+            app:indicator="Pacman"
+            app:indicator_color="@color/main_color" />
+    </LinearLayout>
+</layout>
