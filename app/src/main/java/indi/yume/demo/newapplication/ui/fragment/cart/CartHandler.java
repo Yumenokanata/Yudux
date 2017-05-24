@@ -173,7 +173,8 @@ public class CartHandler {
                                 .toList()
                                 .compose(composeNetProgressDialog(context))
                                 .flatMap(list -> showDialogAction(context, list))
-                                .flatMap(list -> payAction(context, presenter, list, state));
+                                .flatMap(list -> payAction(context, presenter, list, state))
+                                .doOnSuccess(l -> postUI(() -> Toast.makeText(context, "购买成功", Toast.LENGTH_LONG).show()));
                     },
                     (result, state) ->
                             state.withCartState(state.getCartState().withCart(
@@ -197,7 +198,7 @@ public class CartHandler {
                 .compose(composeNetProgressDialog(context))
                 .compose(DealErrorUtil.dealErrorRetry(context))
                 .map(result -> {
-                    if(result.getStatus() == STATUS_OK)
+                    if(STATUS_OK.equals(result.getStatus()))
                         return Stream.of(list).map(m -> m.getModel().getBarCode()).toList();
                     else
                         return Collections.emptyList();
