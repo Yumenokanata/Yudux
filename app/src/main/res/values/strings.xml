@@ -136,6 +136,7 @@
     <string name="userinfo_account">你的用户名</string>
     <string name="userinfo_name">你的姓名</string>
     <string name="userinfo_point">你的飞狼币</string>
+    <string name="userinfo_logout">登出</string>
     <string name="userinfo_changepassword">修改密码</string>
     <string name="userinfo_about">关于</string>
 

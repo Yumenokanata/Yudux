@@ -68,6 +68,9 @@ public class SlideMenuView extends FrameLayout {
             case R.id.qr_item_view:
                 switchToStack(SlideMenuScreensTag.QR);
                 break;
+            case R.id.other_item_view:
+                switchToStack(SlideMenuScreensTag.OTHER);
+                break;
         }
 
         if (listener != null)
@@ -82,6 +85,7 @@ public class SlideMenuView extends FrameLayout {
         binding.myPageItemView.setSelected(false);
         binding.cartItemView.setSelected(false);
         binding.qrItemView.setSelected(false);
+        binding.otherItemView.setSelected(false);
         SlideMenuActions.enableDrawer(true);
 
         //设置侧边栏item选中状态以及切换fragment
@@ -111,6 +115,10 @@ public class SlideMenuView extends FrameLayout {
                         .withEnterAnim(R.anim.fragment_left_enter)
                         .withExitAnim(R.anim.fragment_left_exit)
                         .start(activity);
+                break;
+            case OTHER:
+                binding.otherItemView.setSelected(true);
+                activity.switchToStackByTag(SlideMenuScreensTag.OTHER.getTag());
                 break;
         }
     }

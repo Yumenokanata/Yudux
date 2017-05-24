@@ -1,4 +1,4 @@
-package ${basePackage}${fragmentPackage}.${-name};
+package indi.yume.demo.newapplication.ui.fragment.other;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -6,44 +6,45 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ${basePackage}.R;
-import ${basePackage}.databinding.${name}FragmentBinding;
-import ${basePackage}.ui.AppComponent;
-import ${basePackage}.ui.MainApplication;
-import ${basePackage}${componentPackage}.Dagger${name}Component;
-import ${basePackage}${componentPackage}.${name}Component;
-import ${basePackage}.ui.AppState;
-import ${basePackage}${fragmentPackage}.base.BaseToolbarFragment;
-import ${basePackage}${modulePackage}.${name}Module;
-import ${basePackage}${presenterPackage}.${name}Presenter;
+import indi.yume.demo.newapplication.R;
+import indi.yume.demo.newapplication.databinding.OtherFragmentBinding;
+import indi.yume.demo.newapplication.ui.AppComponent;
+import indi.yume.demo.newapplication.ui.MainApplication;
+import indi.yume.demo.newapplication.ui.component.DaggerOtherComponent;
+import indi.yume.demo.newapplication.ui.component.OtherComponent;
+import indi.yume.demo.newapplication.ui.AppState;
+import indi.yume.demo.newapplication.ui.fragment.base.BaseToolbarFragment;
+import indi.yume.demo.newapplication.ui.module.OtherModule;
+import indi.yume.demo.newapplication.ui.presenter.OtherPresenter;
 import indi.yume.yudux.collection.ContextCollection;
 
-import static ${basePackage}.ui.AppStore.mainStore;
-import static ${basePackage}${fragmentPackage}.${-name}.${name}Fragment.${name}Key.*;
+import static indi.yume.demo.newapplication.ui.AppStore.mainStore;
+import static indi.yume.demo.newapplication.ui.fragment.other.OtherFragment.OtherKey.*;
 import static indi.yume.yudux.collection.DSL.*;
 import static indi.yume.yudux.DSL.*;
 
 /**
- * Created by DaggerGenerator on ${date}.
+ * Created by DaggerGenerator on 2017-05-24.
  */
-public class ${name}Fragment extends BaseToolbarFragment {
-    enum ${name}Key {
+public class OtherFragment extends BaseToolbarFragment {
+    enum OtherKey {
         CONTEXT,
+        FRAGMENT,
         VIEW,
         BINDER,
         PRESENTER,
         HANDLER
     }
 
-    private final ContextCollection<${name}Key> repo =
-            ContextCollection.<${name}Key>builder()
+    private final ContextCollection<OtherKey> repo =
+            ContextCollection.<OtherKey>builder()
                     .withItem(HANDLER,
                             depends(),
-                            (real, repo) -> new ${name}Handler(repo))
+                            (real, repo) -> new OtherHandler(repo))
                     .withItem(BINDER,
                             depends(VIEW, HANDLER),
                             (real, repo) -> {
-                                ${name}FragmentBinding binding = ${name}FragmentBinding.bind(real.getItem(VIEW));
+                                OtherFragmentBinding binding = OtherFragmentBinding.bind(real.getItem(VIEW));
                                 binding.setHandler(real.getItem(HANDLER));
 
                                 return binding;
@@ -52,12 +53,12 @@ public class ${name}Fragment extends BaseToolbarFragment {
                             depends(CONTEXT),
                             (real, repo) -> {
                                 AppComponent appComponent = MainApplication.getInstance(real.getItem(CONTEXT)).getAppComponent();
-                                ${name}Component ${<name}Component = Dagger${name}Component.builder()
+                                OtherComponent otherComponent = DaggerOtherComponent.builder()
                                         .appComponent(appComponent)
-                                        .${<name}Module(new ${name}Module(this))
+                                        .otherModule(new OtherModule(this))
                                         .build();
-                                ${name}Presenter presenter = ${<name}Component.getPresenter();
-                                ${<name}Component.injectPresenter(presenter);
+                                OtherPresenter presenter = otherComponent.getPresenter();
+                                otherComponent.injectPresenter(presenter);
 
                                 return presenter;
                             })
@@ -67,14 +68,15 @@ public class ${name}Fragment extends BaseToolbarFragment {
         subscribeUntilChanged(
                 mainStore,
                 extra(repo, depends(BINDER)),
-                s -> s.get${>name}State(),
-                (real, state) -> real.<${name}FragmentBinding>getItem(BINDER).setModel(state));
+                s -> s.getOtherState(),
+                (real, state) -> real.<OtherFragmentBinding>getItem(BINDER).setModel(state));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        View view = inflater.inflate(R.layout.${_-name}_fragment, container, false);
+        View view = inflater.inflate(R.layout.other_fragment, container, false);
         repo.ready(VIEW, view);
+        repo.ready(FRAGMENT, this);
         forceRender(mainStore);
         return view;
     }

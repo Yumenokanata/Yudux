@@ -128,6 +128,17 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/bg_color"/>
+        <include layout="@layout/slide_menu_item_layout"
+            android:id="@+id/other_item_view"
+            bind:iconSrc="@{@drawable/ic_find_in_page_black_24dp}"
+            bind:itemBack="@{@drawable/slide_menu_back}"
+            bind:itemText="@{@string/slide_title_other}"
+            bind:textColor="@{@color/slide_menu_text_color}"
+            bind:handler="@{handler}"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bg_color"/>
 
 
         <!--<com.fenrir.app.fenrirpay.view.slidemenu.MenuItemView-->

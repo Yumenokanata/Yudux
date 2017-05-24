@@ -8,6 +8,7 @@ import indi.yume.demo.newapplication.ui.fragment.cart.CartState;
 import indi.yume.demo.newapplication.ui.fragment.home.HomeState;
 import indi.yume.demo.newapplication.ui.fragment.keep.KeepState;
 import indi.yume.demo.newapplication.ui.fragment.mypage.MyPageState;
+import indi.yume.demo.newapplication.ui.fragment.other.OtherState;
 import indi.yume.demo.newapplication.ui.fragment.qrscan.QrScanState;
 import indi.yume.demo.newapplication.ui.fragment.search.SearchState;
 import indi.yume.demo.newapplication.util.SlideMenuScreensTag;
@@ -41,10 +42,12 @@ public class AppState {
     private final CartState cartState;
     @Wither
     private final QrScanState qrScanState;
+    @Wither
+    private final OtherState otherState;
 
     public static AppState empty() {
         return new AppState(null, SlideMenuScreensTag.HOME, false,
-                new LoginState(), new HomeState(), new SearchState(),
-                new KeepState(), new MyPageState(), new CartState(), new QrScanState());
+                new LoginState(), new HomeState(), new SearchState(), new KeepState(),
+                new MyPageState(), new CartState(), new QrScanState(), new OtherState());
     }
 }

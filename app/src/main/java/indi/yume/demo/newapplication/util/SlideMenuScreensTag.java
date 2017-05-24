@@ -4,6 +4,7 @@ import indi.yume.demo.newapplication.ui.fragment.cart.CartFragment;
 import indi.yume.demo.newapplication.ui.fragment.home.HomeFragment;
 import indi.yume.demo.newapplication.ui.fragment.keep.KeepFragment;
 import indi.yume.demo.newapplication.ui.fragment.mypage.MyPageFragment;
+import indi.yume.demo.newapplication.ui.fragment.other.OtherFragment;
 import indi.yume.demo.newapplication.ui.fragment.qrscan.QrScanFragment;
 import indi.yume.demo.newapplication.ui.fragment.search.SearchFragment;
 import indi.yume.tools.fragmentmanager.BaseManagerFragment;
@@ -40,11 +41,11 @@ public enum SlideMenuScreensTag {
     /**
      * QR界面
      */
-    QR("qr", QrScanFragment.class);
-//    /**
-//     * 其他界面
-//     */
-//    OTHER("other", A00_01_LoginFragment.class);
+    QR("qr", QrScanFragment.class),
+    /**
+     * 其他界面
+     */
+    OTHER("other", OtherFragment.class);
 
     @Getter
     private String tag;
