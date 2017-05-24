@@ -127,13 +127,13 @@ public class KeepFragment extends BaseToolbarFragment {
                 mainStore,
                 extra(repo, depends(BINDER)),
                 s -> s.getKeepState(),
-                (state, real) -> {
+                (real, state) -> {
                     System.out.println(getClass().getSimpleName() + "| Render Keep: " + state);
                     real.<KeepFragmentBinding>getItem(BINDER).setModel(state);
                 });
         subscribe(mainStore,
                 extra(repo, depends(ADAPTER)),
-                (state, real) -> real.<RendererAdapter>getItem(ADAPTER).update(state.getKeepState()));
+                (real, state) -> real.<RendererAdapter>getItem(ADAPTER).update(state.getKeepState()));
     }
 
     @Override

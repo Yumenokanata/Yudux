@@ -46,6 +46,10 @@ object DSL {
                     }, emptyReducer())
 
     @JvmStatic
+    fun <State> reduce(reducer: (State) -> State): StoreAction<State> =
+            StoreActionDefault<State, Unit>({ Single.just(Unit) }, { _, s -> reducer(s) })
+
+    @JvmStatic
     fun <R : MultiReal, D : Depends<R>, State, SubState, Data> action(
             depends: D,
             selector: (State) -> SubState,

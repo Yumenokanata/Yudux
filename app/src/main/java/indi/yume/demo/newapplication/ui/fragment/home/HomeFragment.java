@@ -176,15 +176,15 @@ public class HomeFragment extends BaseToolbarFragment{
         subscribeUntilChanged(mainStore,
                 extra(repo, depends(BINDER)),
                 AppState::getHomeState,
-                (state, real) -> real.<HomeFragmentBinding>getItem(BINDER).setState(state));
+                (real, state) -> real.<HomeFragmentBinding>getItem(BINDER).setState(state));
         subscribeUntilChanged(mainStore,
                 extra(repo, depends(LAST_ADAPTER)),
                 AppState::getHomeState,
-                (state, real) -> real.<RendererAdapter>getItem(LAST_ADAPTER).update(state));
+                (real, state) -> real.<RendererAdapter>getItem(LAST_ADAPTER).update(state));
         subscribeUntilChanged(mainStore,
                 extra(repo, depends(NEW_ADAPTER)),
                 AppState::getHomeState,
-                (state, real) -> real.<RendererAdapter>getItem(NEW_ADAPTER).update(state));
+                (real, state) -> real.<RendererAdapter>getItem(NEW_ADAPTER).update(state));
     }
 
     @Override

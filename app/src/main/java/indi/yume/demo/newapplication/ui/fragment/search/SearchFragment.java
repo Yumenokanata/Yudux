@@ -215,7 +215,7 @@ public class SearchFragment extends BaseToolbarFragment{
     {
         subscribe(mainStore,
                 extra(repo, depends(BINDER)),
-                (state, real) -> {
+                (real, state) -> {
                     SearchFragmentBinding binding = real.getItem(BINDER);
                     binding.setModel(state.getSearchState());
                     if(!state.getSearchState().isLoading())
@@ -223,11 +223,11 @@ public class SearchFragment extends BaseToolbarFragment{
                 });
         subscribe(mainStore,
                 extra(repo, depends(MENU)),
-                (state, real) -> real.<MenuItem>getItem(MENU)
+                (real, state) -> real.<MenuItem>getItem(MENU)
                         .setEnabled(!state.getSearchState().isLoading() && !state.getSearchState().getResult().isEmpty()));
         subscribe(mainStore,
                 extra(repo, depends(RESULT_ADAPTER)),
-                (state, real) -> real.<RendererAdapter>getItem(RESULT_ADAPTER).update(state.getSearchState()));
+                (real, state) -> real.<RendererAdapter>getItem(RESULT_ADAPTER).update(state.getSearchState()));
     }
 
     @Override

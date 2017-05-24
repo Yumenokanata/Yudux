@@ -6,6 +6,7 @@ import android.support.multidex.MultiDex;
 
 //import indi.yume.tools.fragmentmanager.ThrottleUtil;
 import indi.yume.demo.newapplication.component.cart.CartActions;
+import indi.yume.demo.newapplication.component.slidemenu.SlideMenuActions;
 import indi.yume.yudux.store.Store;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,6 +35,7 @@ public class MainApplication extends Application {
         initMainRepo(appComponent);
         refreshKeep();
         CartActions.init();
+        SlideMenuActions.init();
 
 //        ThrottleUtil.setThrottleTime(300);
     }

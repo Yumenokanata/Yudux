@@ -16,7 +16,11 @@ public class AppStore {
 
     public enum MainKey {
         Shared,
-        AppContext
+        AppContext,
+        /**
+         * {@link indi.yume.demo.newapplication.component.slidemenu.SlideMenuActions}
+         */
+        MainActivity
     }
 
     public static final ContextCollection<MainKey> mainRepo = ContextCollection.<MainKey>builder().build();

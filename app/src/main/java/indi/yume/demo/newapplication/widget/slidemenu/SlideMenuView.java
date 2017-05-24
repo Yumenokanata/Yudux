@@ -1,16 +1,20 @@
 package indi.yume.demo.newapplication.widget.slidemenu;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import indi.yume.demo.newapplication.R;
+import indi.yume.demo.newapplication.component.slidemenu.SlideMenuActions;
 import indi.yume.demo.newapplication.databinding.SlideMenuLayoutBinding;
 import indi.yume.demo.newapplication.functions.Receiver;
 import indi.yume.demo.newapplication.ui.activity.base.SlideMenuActivity;
+import indi.yume.demo.newapplication.ui.fragment.qrscan.QrScanFragment;
 import indi.yume.demo.newapplication.util.SlideMenuScreensTag;
+import indi.yume.tools.fragmentmanager.StartBuilder;
 import lombok.Setter;
 
 /**
@@ -61,6 +65,9 @@ public class SlideMenuView extends FrameLayout {
             case R.id.cart_item_view:
                 switchToStack(SlideMenuScreensTag.CART);
                 break;
+            case R.id.qr_item_view:
+                switchToStack(SlideMenuScreensTag.QR);
+                break;
         }
 
         if (listener != null)
@@ -74,7 +81,8 @@ public class SlideMenuView extends FrameLayout {
         binding.keepItemView.setSelected(false);
         binding.myPageItemView.setSelected(false);
         binding.cartItemView.setSelected(false);
-        activity.setEnableDrawer(true);
+        binding.qrItemView.setSelected(false);
+        SlideMenuActions.enableDrawer(true);
 
         //设置侧边栏item选中状态以及切换fragment
         switch (tag) {
@@ -97,6 +105,12 @@ public class SlideMenuView extends FrameLayout {
             case CART:
                 binding.cartItemView.setSelected(true);
                 activity.switchToStackByTag(SlideMenuScreensTag.CART.getTag());
+                break;
+            case QR:
+                StartBuilder.builder(new Intent(activity, QrScanFragment.class))
+                        .withEnterAnim(R.anim.fragment_left_enter)
+                        .withExitAnim(R.anim.fragment_left_exit)
+                        .start(activity);
                 break;
         }
     }

@@ -38,7 +38,7 @@ public class CartActions {
         subscribeUntilChanged(mainStore,
                 extra(mainRepo, depends(Shared)),
                 s -> s.getCartState(),
-                (state, real) -> real.<SharedPrefModel>getItem(Shared).setCartGoodsModelList(state.getCart()));
+                (real, state) -> real.<SharedPrefModel>getItem(Shared).setCartGoodsModelList(state.getCart()));
     }
 
     public static void refreshKeep() {
@@ -52,6 +52,20 @@ public class CartActions {
                         },
                         (CartState cart, AppState s) -> s.withCartState(cart)
                 )));
+    }
+
+    public static void putItem(GoodsModel model) {
+        mainStore.dispatch(mainAction(model, (m, state) -> {
+            if(state.getCartState().isShownDialog())
+                return state;
+
+            boolean hasItem = Stream.of(state.getCartState().getCart())
+                    .anyMatch(i -> TextUtils.equals(i.getModel().getBarCode(), model.getBarCode()));
+            List<CartState.ItemData> list = hasItem ? state.getCartState().getCart()
+                    : plus(state.getCartState().getCart(), new CartState.ItemData(m, 1, false));
+
+            return state.withCartState(state.getCartState().withCart(list));
+        }));
     }
 
     public static void toggle(GoodsModel model) {

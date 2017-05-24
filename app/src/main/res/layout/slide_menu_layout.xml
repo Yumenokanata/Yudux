@@ -14,52 +14,53 @@
         android:background="@color/white"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:clickable="true"
-            android:layout_width="match_parent"
-            android:layout_height="192dp"
-            android:background="?attr/selectableItemBackground">
+        <!--<RelativeLayout-->
+            <!--android:clickable="true"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="192dp"-->
+            <!--android:background="?attr/selectableItemBackground">-->
 
-            <ImageView
-                android:clickable="true"
-                android:background="?attr/selectableItemBackground"
-                android:id="@+id/head_bg_imageview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scaleType="centerCrop" />
+            <!--<ImageView-->
+                <!--android:clickable="true"-->
+                <!--android:background="?attr/selectableItemBackground"-->
+                <!--android:id="@+id/head_bg_imageview"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:scaleType="centerCrop" />-->
 
-            <ImageView
-                android:id="@+id/avator_imageview"
-                android:layout_width="112dp"
-                android:layout_height="112dp"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
-                android:background="?attr/selectableItemBackgroundBorderless" />
+            <!--<ImageView-->
+                <!--android:id="@+id/avator_imageview"-->
+                <!--android:layout_width="112dp"-->
+                <!--android:layout_height="112dp"-->
+                <!--android:layout_marginBottom="8dp"-->
+                <!--android:layout_marginLeft="16dp"-->
+                <!--android:layout_marginTop="16dp"-->
+                <!--android:background="?attr/selectableItemBackgroundBorderless" />-->
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="8dp">
+            <!--<RelativeLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="48dp"-->
+                <!--android:layout_alignParentBottom="true"-->
+                <!--android:layout_marginBottom="8dp">-->
 
-                <TextView
-                    android:textColor="@color/color_wh"
-                    android:id="@+id/username_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="16dp"
-                    android:clickable="false" />
+                <!--<TextView-->
+                    <!--android:textColor="@color/color_wh"-->
+                    <!--android:id="@+id/username_textview"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:layout_marginLeft="16dp"-->
+                    <!--android:clickable="false" />-->
 
-            </RelativeLayout>
-        </RelativeLayout>
+            <!--</RelativeLayout>-->
+        <!--</RelativeLayout>-->
 
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/bg_color" />
+            android:background="@color/bg_color"
+            android:layout_marginTop="50dp"/>
 
         <include layout="@layout/slide_menu_item_layout"
             android:id="@+id/home_item_view"
@@ -68,6 +69,10 @@
             bind:itemText="@{@string/slide_shop}"
             bind:textColor="@{@color/slide_menu_text_color}"
             bind:handler="@{handler}"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bg_color"/>
         <include layout="@layout/slide_menu_item_layout"
             android:id="@+id/search_item_view"
             bind:iconSrc="@{@drawable/ic_shopping_cart_black_24dp}"
@@ -75,6 +80,10 @@
             bind:itemText="@{@string/slide_title_search}"
             bind:textColor="@{@color/slide_menu_text_color}"
             bind:handler="@{handler}"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bg_color"/>
         <include layout="@layout/slide_menu_item_layout"
             android:id="@+id/keep_item_view"
             bind:iconSrc="@{@drawable/ic_find_in_page_black_24dp}"
@@ -82,6 +91,10 @@
             bind:itemText="@{@string/slide_title_keep}"
             bind:textColor="@{@color/slide_menu_text_color}"
             bind:handler="@{handler}"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bg_color"/>
         <include layout="@layout/slide_menu_item_layout"
             android:id="@+id/my_page_item_view"
             bind:iconSrc="@{@drawable/ic_find_in_page_black_24dp}"
@@ -89,6 +102,10 @@
             bind:itemText="@{@string/slide_title_my_page}"
             bind:textColor="@{@color/slide_menu_text_color}"
             bind:handler="@{handler}"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bg_color"/>
         <include layout="@layout/slide_menu_item_layout"
             android:id="@+id/cart_item_view"
             bind:iconSrc="@{@drawable/ic_find_in_page_black_24dp}"
@@ -96,6 +113,21 @@
             bind:itemText="@{@string/slide_title_cart}"
             bind:textColor="@{@color/slide_menu_text_color}"
             bind:handler="@{handler}"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bg_color"/>
+        <include layout="@layout/slide_menu_item_layout"
+            android:id="@+id/qr_item_view"
+            bind:iconSrc="@{@drawable/ic_find_in_page_black_24dp}"
+            bind:itemBack="@{@drawable/slide_menu_back}"
+            bind:itemText="@{@string/slide_title_qr}"
+            bind:textColor="@{@color/slide_menu_text_color}"
+            bind:handler="@{handler}"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bg_color"/>
 
 
         <!--<com.fenrir.app.fenrirpay.view.slidemenu.MenuItemView-->

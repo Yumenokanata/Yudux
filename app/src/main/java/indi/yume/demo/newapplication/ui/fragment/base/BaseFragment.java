@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 
+import indi.yume.demo.newapplication.component.slidemenu.SlideMenuActions;
 import indi.yume.demo.newapplication.ui.AppComponent;
 import indi.yume.demo.newapplication.ui.AppMessageUtil;
 import indi.yume.demo.newapplication.ui.MainApplication;
@@ -146,8 +147,7 @@ public abstract class BaseFragment extends BaseManagerFragment {
     }
 
     protected void enableDrawer(boolean enable) {
-        if(getActivity() instanceof SlideMenuActivity)
-            ((SlideMenuActivity)getActivity()).setEnableDrawer(enable);
+        SlideMenuActions.enableDrawer(enable);
     }
 
 //    protected <T> Observable.Transformer<T, T> showNetProgressDialog(int title){

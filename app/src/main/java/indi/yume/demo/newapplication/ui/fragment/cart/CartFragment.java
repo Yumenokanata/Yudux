@@ -102,12 +102,12 @@ public class CartFragment extends BaseToolbarFragment {
                 mainStore,
                 extra(repo, depends(BINDER)),
                 s -> s.getCartState(),
-                (state, real) -> real.<CartFragmentBinding>getItem(BINDER).setModel(state));
+                (real, state) -> real.<CartFragmentBinding>getItem(BINDER).setModel(state));
         subscribeUntilChanged(
                 mainStore,
                 extra(repo, depends(ADAPTER)),
                 s -> s.getCartState(),
-                (state, real) -> real.<RendererAdapter<List<ItemData>>>getItem(ADAPTER).update(state.getCart()));
+                (real, state) -> real.<RendererAdapter<List<ItemData>>>getItem(ADAPTER).update(state.getCart()));
     }
 
     @Override

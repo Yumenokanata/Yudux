@@ -200,17 +200,17 @@ public class MyPageFragment extends BaseToolbarFragment {
                 mainStore,
                 extra(repo, depends(BINDER)),
                 s -> s.getUserModel(),
-                (state, real) -> real.<MyPageFragmentBinding>getItem(BINDER).setUser(state));
+                (real, state) -> real.<MyPageFragmentBinding>getItem(BINDER).setUser(state));
         subscribeUntilChanged(
                 mainStore,
                 extra(repo, depends(BINDER)),
                 s -> s.getMyPageState(),
-                (state, real) -> real.<MyPageFragmentBinding>getItem(BINDER).setModel(state));
+                (real, state) -> real.<MyPageFragmentBinding>getItem(BINDER).setModel(state));
         subscribeUntilChanged(
                 mainStore,
                 extra(repo, depends(PAGE_ADAPTER)),
                 s -> s.getMyPageState(),
-                (state, real) -> real.<RendererAdapter>getItem(PAGE_ADAPTER).update(state));
+                (real, state) -> real.<RendererAdapter>getItem(PAGE_ADAPTER).update(state));
     }
 
     @Override

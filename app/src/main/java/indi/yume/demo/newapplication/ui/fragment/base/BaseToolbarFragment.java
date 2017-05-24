@@ -40,8 +40,10 @@ public abstract class BaseToolbarFragment extends BaseFragment {
                             (real, store) -> {
                                 View view = real.getItem(VIEW);
                                 CustomToolbar toolbar = (CustomToolbar) view.findViewById(R.id.toolbar);
-                                if(toolbar == null)
+                                if(toolbar == null) {
+                                    enableDrawer(false);
                                     return null;
+                                }
                                 real.<AppCompatActivity>getItem(ACTIVITY).setSupportActionBar(toolbar);
 
                                 if (toolbar.getMode() == TOOLBAR_MODE_MENU)

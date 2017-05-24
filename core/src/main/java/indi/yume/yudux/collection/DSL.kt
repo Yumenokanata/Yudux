@@ -13,12 +13,12 @@ object DSL {
     @JvmStatic
     fun <R : MultiReal, State> subscribe(mainStore: Store<State>,
                                          depends: ContextProvider<R>,
-                                         subscriber: BiSubscriber<State, MultiReal>): Subscription {
+                                         subscriber: BiSubscriber<R, State>): Subscription {
         return mainStore.subscribe(object : Subscriber<State> {
             override fun onStateChange(state: State) {
                 val result = depends.get()
                 when(result) {
-                    is Right -> subscriber.onStateChange(state, result.right)
+                    is Right -> subscriber.onStateChange(result.right, state)
                     is Left -> Log.d(TAG,
                             "Can not subscribe, depends not ready: ${result.left.joinToString(separator = ",")}")
                 }
@@ -29,14 +29,14 @@ object DSL {
     @JvmStatic
     fun <R : MultiReal, State> subscribeUntilChanged(mainStore: Store<State>,
                                                      depends: ContextProvider<R>,
-                                                     subscriber: BiSubscriber<State, MultiReal>): Subscription =
+                                                     subscriber: BiSubscriber<R, State>): Subscription =
             subscribeUntilChanged(mainStore, depends, { it }, subscriber)
 
     @JvmStatic
     fun <R : MultiReal, State, T> subscribeUntilChanged(mainStore: Store<State>,
                                                         depends: ContextProvider<R>,
                                                         mapper: (State) -> T,
-                                                        subscriber: BiSubscriber<T, MultiReal>): Subscription {
+                                                        subscriber: BiSubscriber<R, T>): Subscription {
         return mainStore.subscribe(object : Subscriber<State> {
             var lastState: T? = null
             var hasValue = false
@@ -54,7 +54,7 @@ object DSL {
 
                 val result = depends.get()
                 when(result) {
-                    is Right -> subscriber.onStateChange(newS, result.right)
+                    is Right -> subscriber.onStateChange(result.right, newS)
                     is Left -> Log.d(TAG,
                             "Can not subscribe, depends not ready: ${result.left.joinToString(separator = ",")}")
                 }
@@ -67,7 +67,7 @@ object DSL {
                                                         depends: ContextProvider<R>,
                                                         compare: (State, State) -> Boolean,
                                                         mapper: (State) -> T,
-                                                        subscriber: BiSubscriber<T, MultiReal>): Subscription {
+                                                        subscriber: BiSubscriber<R, T>): Subscription {
         return mainStore.subscribe(object : Subscriber<State> {
             var lastState: State? = null
             var hasValue = false
@@ -85,7 +85,7 @@ object DSL {
 
                 val result = depends.get()
                 when(result) {
-                    is Right -> subscriber.onStateChange(newData, result.right)
+                    is Right -> subscriber.onStateChange(result.right, newData)
                     is Left -> Log.d(TAG,
                             "Can not subscribe, depends not ready: ${result.left.joinToString(separator = ",")}")
                 }
@@ -95,12 +95,12 @@ object DSL {
 
     @JvmStatic
     fun <R : MultiReal, State> subscribe(mainStore: Store<State>,
-                                         depends: ContextProvider<R>): Observable<Pair<State, MultiReal>> {
+                                         depends: ContextProvider<R>): Observable<Pair<R, State>> {
         return mainStore.subscribe()
                 .flatMap { state ->
                     val result = depends.get()
                     when(result) {
-                        is Right -> Observable.just(state to result.right)
+                        is Right -> Observable.just(result.right to state)
 //                        is Left -> Observable.error(DependsNotReadyException(result.left))
                         is Left -> {
                             Log.d(TAG,

@@ -7,6 +7,7 @@ import android.widget.Toast;
 import org.jetbrains.annotations.NotNull;
 
 import indi.yume.demo.newapplication.R;
+import indi.yume.demo.newapplication.component.slidemenu.SlideMenuActions;
 import indi.yume.demo.newapplication.ui.AppComponent;
 import indi.yume.demo.newapplication.ui.activity.base.BaseFragmentActivity;
 import indi.yume.demo.newapplication.ui.activity.base.SlideMenuActivity;
@@ -46,7 +47,8 @@ public class MainBaseActivity extends SlideMenuActivity {
 //        setDefaultFragmentAnim(R.anim.activity_open_enter,
 //                R.anim.activity_close_exit,
 //                R.anim.stay_anim);
-        switchToStackByTag(SlideMenuScreensTag.HOME.getTag());
+        SlideMenuActions.register(this);
+        SlideMenuActions.switchTag(SlideMenuScreensTag.HOME);
     }
 
     @Override
@@ -68,5 +70,11 @@ public class MainBaseActivity extends SlideMenuActivity {
                 return true;
             }
         return false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        SlideMenuActions.destroy();
+        super.onDestroy();
     }
 }

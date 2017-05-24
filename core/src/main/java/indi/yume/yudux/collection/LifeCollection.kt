@@ -314,7 +314,8 @@ class ContextCollection<Key>(private var providerList: Map<Key, Module<Key, *>> 
                 val result = newModule.isReady
                 if (result is Right && !newModule.isInit) {
                     newModule = newModule.init(getDepends(allDependsMap, result.right).right!!)
-                    newReadyMap += key to newModule.context!!
+                    if(newModule.isInit)
+                        newReadyMap += key to newModule.context!!
                 }
 
                 newProviderMap += key to newModule
