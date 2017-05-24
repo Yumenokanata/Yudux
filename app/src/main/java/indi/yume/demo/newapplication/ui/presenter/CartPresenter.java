@@ -42,15 +42,7 @@ public class CartPresenter extends BasePresenter{
                 .map(m -> m.getModel().getBarCode() + "," + m.getCount())
                 .collect(Collectors.joining(";"));
 
-//        return payGoodsService.payManyGoods(token, cart)
-//                .compose(switchThread());
-        return Single.just(cart)
-                .map(s -> {
-                    System.out.println("pay: " + cart);
-                    ResultModel result = new ResultModel();
-                    result.setStatus(STATUS_OK);
-                    return result;
-                })
+        return payGoodsService.payManyGoods(token, cart)
                 .compose(switchThread());
     }
 
